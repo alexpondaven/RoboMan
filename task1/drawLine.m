@@ -1,4 +1,5 @@
 function drawLine(P_src, P_dst)
-    [x,y,z] = getLineCoord(P_src(1:3,4),P_dst(1:3,4));
+    % Draws line between two joints POSITIONS (x,y,z)
+    [x,y,z] = getLineCoord(P_src,P_dst);
     line(x,y,z,'Color','k','LineWidth',5)
 end
