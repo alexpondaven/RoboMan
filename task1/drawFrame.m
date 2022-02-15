@@ -1,6 +1,6 @@
-function drawFrame(origin)
+function drawFrame(origin, frameSize)
     % define length of coordinate frame vectors
-    frameSize = 20;
+%     frameSize = 20;
 
     pos = origin(1:3,4);
     % Draw X coordinate frame vector from origin

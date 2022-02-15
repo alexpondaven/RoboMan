@@ -3,8 +3,10 @@ function T_i = DHTransform(param)
     % param.a - previous joint length
     % param.alpha - angle between joint axes
     % param.d - distance between links along z
-    theta = deg2rad(param.theta);
-    alpha = deg2rad(param.alpha);
+%     theta = deg2rad(param.theta);
+%     alpha = deg2rad(param.alpha);
+    theta = param.theta;
+    alpha = param.alpha;
     a = param.a;
     d = param.d;
     % Compute DH transform

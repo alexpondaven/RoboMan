@@ -12,15 +12,15 @@ function [T, joints] = coordFrames(theta)
                                 "alpha",    0, ... 
                                 "a",        0, ...
                                 "d",        34));
-    T(:,:,3) = DHTransform(struct("theta",  90, ... % Intermediate
-                                "alpha",    90, ... 
+    T(:,:,3) = DHTransform(struct("theta",  pi/2, ... % Intermediate
+                                "alpha",    pi/2, ... 
                                 "a",        0, ... 
                                 "d",        0)); 
     T(:,:,4) = DHTransform(struct("theta",   theta(2), ... % Base of second servo
                                 "alpha",    0, ... 
                                 "a",        43, ... 
                                 "d",        0)); 
-    T(:,:,5) = DHTransform(struct("theta",   -90, ... % Elbow between servos
+    T(:,:,5) = DHTransform(struct("theta",   -pi/2, ... % Elbow between servos
                                 "alpha",    0, ... 
                                 "a",        128, ... 
                                 "d",        0)); 
@@ -50,7 +50,7 @@ function [T, joints] = coordFrames(theta)
         joints(:,:,i) = joints(:,:,i-1) * T(:,:,i);
 %         symbolic = symbolic * 
     end
-
+    
     %% Plot joints
     
     % Needed to display plot in 3d?
@@ -58,23 +58,22 @@ function [T, joints] = coordFrames(theta)
     
     
     % Draw global frame
-    drawFrame(joints(:,:,1))
+    drawFrame(joints(:,:,1),500)
     
     % Draw all joints and connections
     for i=2:size(T,3)
         % Draw line between previous joint position and current joint position
         drawLine(joints(1:3,4,i-1), joints(1:3,4,i))
         % Draw coordinate frame at joint
-        drawFrame(joints(:,:,i))
+        drawFrame(joints(:,:,i), 20)
     end
 
     % Draw gripper
     drawGripper(joints(:,:,end), theta(5))
 
     % Set limits of build area
-    lb = -100;
     ub = 500;
-    axis([lb,ub,lb,ub,lb,ub])
+    axis([-ub,ub,-100,ub,0,ub])
     grid on
 
     % Plot the current angle

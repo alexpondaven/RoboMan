@@ -4,7 +4,7 @@ function theta = inverseKin(x,y,z,gripSize)
     
     % Solve 2DOF problem 
     x_ = sqrt(x^2+y^2);
-    y_ = z - 77;
+    y_ = z;
     l1 = 130;
     l2 = 124;
 
@@ -14,9 +14,8 @@ function theta = inverseKin(x,y,z,gripSize)
     k2 = l2*s2;
     theta_a = atan2(x_,y_) - atan2(k2,k1);
     theta_b = atan2(s2,c2);
-    phi = atan(24/128);
-%     theta(2) = -(pi/2 - theta_a - phi);
-    theta(2) = theta_a + phi; 
+    
+    theta(2) = pi/2;
     theta(3) = pi/2 - theta_b;
 
     

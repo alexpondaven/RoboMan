@@ -123,7 +123,7 @@ end
 timestep = 0.01
 duration = 10
 sineT = [0:timestep:duration];
-sinePos = ( sin(sineT) + 1 ) / 2 * 4095 ;  % to ticks
+sine    Pos = ( sin(sineT) + 1 ) / 2 * 4095 ;  % to ticks
 
 tHist = []
 tSetPointHist = []
