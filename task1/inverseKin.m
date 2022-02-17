@@ -18,9 +18,8 @@ function theta = inverseKin(x,y,z,gripSize)
 %     theta(2) = -(pi/2 - theta_a - phi);
     theta(2) = theta_a + phi; 
     theta(3) = pi/2 - theta_b;
-
     
-    theta(4) = 0;
+    theta(4) = pi/2;
     theta(5) = gripSize;
     
     %% TY's IK solution below

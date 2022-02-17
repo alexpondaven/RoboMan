@@ -40,8 +40,11 @@ clear all
 % 
 % T = T1*T2*T3*T4*T5*T6*T7*T8;
 
-theta = inverseKin(0,150,0,10);
-coordFrames(theta)
+theta = inverseKin(150,0,50,10);
+coordFrames(theta);
+
+%% Dynamixel theta
+theta = inverseKinDynamixel(150,0,50,10)
 
 %% Draw robot arm
 

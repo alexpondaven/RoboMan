@@ -72,7 +72,7 @@ function [T, joints] = coordFrames(theta)
 
     % Set limits of build area
     ub = 500;
-    axis([-ub,ub,-100,ub,0,ub])
+    axis([-100,ub,-ub,ub,0,ub])
     grid on
 
     % Plot the current angle
