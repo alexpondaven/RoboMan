@@ -31,6 +31,12 @@ ADDR_PRO_TORQUE_ENABLE       = 64;           % Control table address is differen
 ADDR_PRO_GOAL_POSITION       = 116; 
 ADDR_PRO_PRESENT_POSITION    = 132; 
 ADDR_PRO_OPERATING_MODE      = 11;
+ADDR_PRO_DRIVE_MODE          = 10;
+
+ADDR_PRO_GOAL_VELOCITY       = 104;
+ADDR_PRO_PROFILE_VELOCITY    = 112;
+
+
 
 %% ---- Other Settings ---- %%
 
@@ -40,7 +46,7 @@ PROTOCOL_VERSION            = 2.0;          % See which protocol version is used
 % Default setting
 DXL_LIST = [11,12,13,14,15];
 BAUDRATE                    = 1000000;
-DEVICENAME                  = 'COM3';       % Check which port is being used on your controller
+DEVICENAME                  = 'COM5';       % Check which port is being used on your controller
                                             % ex) Windows: 'COM1'   Linux: '/dev/ttyUSB0' Mac: '/dev/tty.usbserial-*'
                                             
 TORQUE_ENABLE               = 1;            % Value for enabling the torque
@@ -109,6 +115,9 @@ for i=1:length(DXL_LIST)
     % Set Dynamixel Torque
     write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_TORQUE_ENABLE, TORQUE_ENABLE);
 
+    % Set profile velocity
+    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_PROFILE_VELOCITY, 2048);
+
     dxl_comm_result = getLastTxRxResult(port_num, PROTOCOL_VERSION);
     dxl_error = getLastRxPacketError(port_num, PROTOCOL_VERSION);
     
@@ -171,26 +180,41 @@ end
 % write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(4), ADDR_PRO_TORQUE_ENABLE, TORQUE_DISABLE);
 
 %% Code snippet for inverse kinematic control
-theta = inverseKinDynamixel(200,-100,50,10)
-for i=1:length(DXL_LIST)
-    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, theta(i));
+
+theta_G = 0;
+
+% Nod
+
+for theta_G = -pi/4:0.1:pi/4
+    theta = inverseKinDynamixel(200,0,150,theta_G,10)
+    for i=1:length(DXL_LIST)
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, theta(i));
+    end
+    pause(0.1)
 end
-pause(3);
-theta = inverseKinDynamixel(100,-100,50,10)
-for i=1:length(DXL_LIST)
-    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, theta(i));
-end
-pause(3);
-theta = inverseKinDynamixel(100,100,50,10)
-for i=1:length(DXL_LIST)
-    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, theta(i));
-end
-pause(3);
-theta = inverseKinDynamixel(200,100,50,10)
-for i=1:length(DXL_LIST)
-    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, theta(i));
-end
-pause(3);
+
+
+% Draw square
+% theta = inverseKinDynamixel(200,-100,50,theta_G,10)
+% for i=1:length(DXL_LIST)
+%     write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, theta(i));
+% end
+% pause(3);
+% theta = inverseKinDynamixel(100,-100,50,theta_G,10)
+% for i=1:length(DXL_LIST)
+%     write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, theta(i));
+% end
+% pause(3);
+% theta = inverseKinDynamixel(100,100,50,theta_G,10)
+% for i=1:length(DXL_LIST)
+%     write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, theta(i));
+% end
+% pause(3);
+% theta = inverseKinDynamixel(200,100,50,theta_G,10)
+% for i=1:length(DXL_LIST)
+%     write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, theta(i));
+% end
+% pause(3);
 
 %% -- Dynamixel Cleanup Start -- %%
 for i=1:length(DXL_LIST)

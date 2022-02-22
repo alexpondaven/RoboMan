@@ -40,11 +40,31 @@ clear all
 % 
 % T = T1*T2*T3*T4*T5*T6*T7*T8;
 
-theta = inverseKin(150,0,50,10);
-coordFrames(theta);
+% theta = inverseKin(150,0,50,0,10);
+% coordFrames(theta);
+z=50;
+while 1
+    % Draw square
+    for y=-50:10:50
+        theta = inverseKin(150,y,z,0,10);
+        coordFrames(theta);
+    end
+    for x=150:10:200
+        theta = inverseKin(x,50,z,0,10);
+        coordFrames(theta);
+    end
+    for y=50:-10:-50
+        theta = inverseKin(200,y,z,0,10);
+        coordFrames(theta);
+    end
+    for x=200:-10:150
+        theta = inverseKin(x,-50,z,0,10);
+        coordFrames(theta);
+    end
+end
 
 %% Dynamixel theta
-theta = inverseKinDynamixel(150,0,50,10)
+% theta = inverseKinDynamixel(150,0,50,10)
 
 %% Draw robot arm
 

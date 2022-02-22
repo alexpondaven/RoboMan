@@ -1,4 +1,6 @@
-function theta = inverseKinDynamixel(x,y,z,theta_)
+function theta = inverseKinDynamixel(x,y,z,theta_G, gripSize)
+    % Wrapper around inverseKin to convert angles to Dynamixel ticks
+
     % SOME_PARAMS_HERE
     D11_OFFSET = pi; % hip
     D12_OFFSET = pi; % shoulder
@@ -32,7 +34,7 @@ function theta = inverseKinDynamixel(x,y,z,theta_)
                  'invert', 1, ...
                  'offset', 0);
 
-    theta = inverseKin(x,y,z,theta_);
+    theta = inverseKin(x,y,z, theta_G, gripSize);
     
     PARAMS = [D11_PARAMS, D12_PARAMS, D13_PARAMS, D14_PARAMS, D15_PARAMS];
     % modify theta

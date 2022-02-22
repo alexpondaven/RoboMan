@@ -1,35 +1,21 @@
-function theta = inverseKin(x,y,z,gripSize)
-    theta(1) = atan2(y,x);
-%     theta(1)=0;
-    
-    % Solve 2DOF problem 
-    x_ = sqrt(x^2+y^2);
-    y_ = z - 77;
-    l1 = 130;
-    l2 = 124;
-
-    c2 = (x_^2+y_^2-l1^2-l2^2)/(2*l1*l2);
-    s2 = sqrt(1-c2^2); % +- choose +ve now
-    k1 = l1+l2*c2;
-    k2 = l2*s2;
-    theta_a = atan2(x_,y_) - atan2(k2,k1);
-    theta_b = atan2(s2,c2);
-    phi = atan(24/128);
-%     theta(2) = -(pi/2 - theta_a - phi);
-    theta(2) = theta_a + phi; 
-    theta(3) = pi/2 - theta_b;
-    
-    theta(4) = pi/2;
-    theta(5) = gripSize;
-    
-    %% TY's IK solution below
-    x_ = sqrt(x^2+y^2);
-    y_ = z - 77;
+function theta = inverseKin(x,y,z,theta_G,gripSize)
+    % constants
     L1 = 128;   % capitalize L to make it look diff from 1
     L2 = 24;
     L3 = 124;
+    L4 = 126;
     alpha_3 = atan(L2/L1);
     R_3 = sqrt(L2^2+L1^2);
+
+    theta(1) = atan2(y,x);
+
+    % Input G1
+    g1_x = sqrt(x^2+y^2);
+    g1_y = z - 77;
+
+    % Calculating G2
+    x_ = g1_x - L4*cos(theta_G);
+    y_ = g1_y - L4*sin(theta_G);
     
     s3_a = (x_^2 + y_^2 - L3^2 - L2^2 - L1^2)/(2*L3*R_3);
     if abs(s3_a) > 1
@@ -53,5 +39,9 @@ function theta = inverseKin(x,y,z,gripSize)
     end
     
     theta(2) = atan2(s2_a, c2_a) - alpha_2;
+
+    theta(4) = theta_G - theta(2) - theta(3);
+
+    theta(5) = gripSize;
     
 end
