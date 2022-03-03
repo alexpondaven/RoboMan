@@ -183,14 +183,82 @@ end
 
 theta_G = 0;
 
-% Nod
+% Nodding function by varying theta_G
+% for theta_G = -pi/4:0.1:pi/4
+%     theta = inverseKinDynamixel(200,0,150,theta_G,10)
+%     for i=1:length(DXL_LIST)
+%         write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, theta(i));
+%     end
+%     pause(0.1)
+% end
 
-for theta_G = -pi/4:0.1:pi/4
-    theta = inverseKinDynamixel(200,0,150,theta_G,10)
+% Rotate box starting from top
+% thetaL = [];
+% %prepare
+% thetaL(end+1,:) = inverseKinDynamixel(150,0,65,-pi/2,deg2rad(95))
+% % open at position
+% thetaL(end+1,:) = inverseKinDynamixel(225,0,65,-pi/2,deg2rad(95))
+% 
+% %closed on cube
+% thetaL(end+1,:) = inverseKinDynamixel(225,0,65,-pi/2,deg2rad(212))
+% 
+% % raise cube - tends to hit everything
+% thetaL(end+1,:) = inverseKinDynamixel(210,0,100,-pi/4,deg2rad(212))
+% 
+% % rotate cube
+% thetaL(end+1,:) = inverseKinDynamixel(210,0,100,0,deg2rad(212))
+% 
+% % place back
+% thetaL(end+1,:) = inverseKinDynamixel(225,0,60,0,deg2rad(212))
+% 
+% % Drop
+% thetaL(end+1,:) = inverseKinDynamixel(225,0,60,0,deg2rad(200))
+
+
+
+% Rotate box grabbing from side
+thetaL = [];
+%prepare
+thetaL(end+1,:) = inverseKinDynamixel(20,0,200,0,deg2rad(95))
+% open at position
+thetaL(end+1,:) = inverseKinDynamixel(225,0,45,0,deg2rad(95))
+
+%closed on cube
+thetaL(end+1,:) = inverseKinDynamixel(225,0,45,0,deg2rad(212))
+
+% raise cube - tends to hit everything
+thetaL(end+1,:) = inverseKinDynamixel(210,0,100,0,deg2rad(212))
+
+% go to 3
+thetaL(end+1,:) = inverseKinDynamixel(155,155,100,-pi/2,deg2rad(212))
+
+% lower
+thetaL(end+1,:) = inverseKinDynamixel(155,155,65,-pi/2,deg2rad(212))
+
+% drop it
+thetaL(end+1,:) = inverseKinDynamixel(155,155,65,-pi/2,deg2rad(95))
+
+%prepare
+thetaL(end+1,:) = inverseKinDynamixel(20,0,200,-pi/2,deg2rad(95))
+
+% POSITIONS OF ALL CUBES
+% 1) grids=(3,-8) - from side
+%   (75,-200,40,0,deg2rad(212))
+% 2) grids=(9,0) -from side
+%   (225,0,40,0,deg2rad(212))
+% 3) grids=(6,6) - from side
+%   (150,150,40,0,deg2rad(212))
+% 4) grids=(5,-5) - from top
+%   (125,-125,50,-pi/2,deg2rad(212))
+% 5) grids=(4,0)
+%   (100,0,50,-pi/2,deg2rad(212))
+% 6) grids = (0,4)
+%   (0,100,50,-pi/2,deg2rad(212))
+for t=1:size(thetaL,1)
     for i=1:length(DXL_LIST)
-        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, theta(i));
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, thetaL(t,i));
     end
-    pause(0.1)
+    pause(2)
 end
 
 
@@ -219,7 +287,7 @@ end
 %% -- Dynamixel Cleanup Start -- %%
 for i=1:length(DXL_LIST)
     % Disable Dynamixel Torque
-    write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_TORQUE_ENABLE, TORQUE_DISABLE);
+%     write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_TORQUE_ENABLE, TORQUE_DISABLE);
     dxl_comm_result = getLastTxRxResult(port_num, PROTOCOL_VERSION);
     dxl_error = getLastRxPacketError(port_num, PROTOCOL_VERSION);
     if dxl_comm_result ~= COMM_SUCCESS

@@ -19,11 +19,11 @@ function theta = inverseKin(x,y,z,theta_G,gripSize)
     
     s3_a = (x_^2 + y_^2 - L3^2 - L2^2 - L1^2)/(2*L3*R_3);
     if abs(s3_a) > 1
-        print("invalid theta 3 value!")
-        return
-    else
-        c3_a = sqrt(1-s3_a^2); % +- choose +ve now
+        disp("invalid theta 3 value!")
+        s3_a=1;
     end
+    c3_a = sqrt(1-s3_a^2); % +- choose +ve now
+
     theta(3) = atan2(s3_a, c3_a) - alpha_3;
     
     k1 = L2 + L3*cos(theta(3));
@@ -32,11 +32,9 @@ function theta = inverseKin(x,y,z,theta_G,gripSize)
     R_2 = sqrt(k1^2 + k2^2);
     s2_a = y_/R_2;
     if abs(s2_a) > 1
-        print("invalid theta 2 value!")
-        return
-    else
-        c2_a = sqrt(1-s2_a^2); % +- choose +ve now
+        disp("invalid theta 2 value!")
     end
+    c2_a = sqrt(1-s2_a^2); % +- choose +ve now
     
     theta(2) = atan2(s2_a, c2_a) - alpha_2;
 
