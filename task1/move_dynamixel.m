@@ -115,7 +115,7 @@ for i=1:length(DXL_LIST)
     % Set Dynamixel Torque
     write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_TORQUE_ENABLE, TORQUE_ENABLE);
 
-    % Set profile velocity
+    % Set profile velocity - smoother motion
     write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_PROFILE_VELOCITY, 2048);
 
     dxl_comm_result = getLastTxRxResult(port_num, PROTOCOL_VERSION);
@@ -184,7 +184,6 @@ end
 theta_G = 0;
 
 % Nod
-
 for theta_G = -pi/4:0.1:pi/4
     theta = inverseKinDynamixel(200,0,150,theta_G,10)
     for i=1:length(DXL_LIST)
