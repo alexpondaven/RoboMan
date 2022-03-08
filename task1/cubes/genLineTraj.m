@@ -5,7 +5,7 @@ function posPath = genLineTraj(pos1,pos2)
 %
 % Sample points according to sine wave as gaps
 % Smaller gaps at ends
-gaps = sin(0:0.2:pi);
+gaps = sin(0:0.1:pi);
 normGaps = cumsum(gaps / sum(gaps));
 
 posPath = zeros(size(normGaps,2),3);

@@ -46,7 +46,7 @@ PROTOCOL_VERSION            = 2.0;          % See which protocol version is used
 % Default setting
 DXL_LIST = [11,12,13,14,15];
 BAUDRATE                    = 1000000;
-DEVICENAME                  = 'COM5';       % Check which port is being used on your controller
+DEVICENAME                  = 'COM4';       % Check which port is being used on your controller
                                             % ex) Windows: 'COM1'   Linux: '/dev/ttyUSB0' Mac: '/dev/tty.usbserial-*'
                                             
 TORQUE_ENABLE               = 1;            % Value for enabling the torque
@@ -116,7 +116,9 @@ for i=1:length(DXL_LIST)
     write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_TORQUE_ENABLE, TORQUE_ENABLE);
 
     % Set profile velocity - smoother motion
-    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_PROFILE_VELOCITY, 2048);
+    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_PROFILE_VELOCITY, 1024);
+    % Profile acceleration
+%     write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), 108, );
 
     dxl_comm_result = getLastTxRxResult(port_num, PROTOCOL_VERSION);
     dxl_error = getLastRxPacketError(port_num, PROTOCOL_VERSION);
@@ -213,33 +215,33 @@ end
 % % Drop
 % thetaL(end+1,:) = inverseKinDynamixel(225,0,60,0,deg2rad(200))
 
+%% Code snippet for box manipulation
 
-
-% Rotate box grabbing from side
-thetaL = [];
-%prepare
-thetaL(end+1,:) = inverseKinDynamixel(20,0,200,0,deg2rad(95))
-% open at position
-thetaL(end+1,:) = inverseKinDynamixel(225,0,45,0,deg2rad(95))
-
-%closed on cube
-thetaL(end+1,:) = inverseKinDynamixel(225,0,45,0,deg2rad(212))
-
-% raise cube - tends to hit everything
-thetaL(end+1,:) = inverseKinDynamixel(210,0,100,0,deg2rad(212))
-
-% go to 3
-thetaL(end+1,:) = inverseKinDynamixel(155,155,100,-pi/2,deg2rad(212))
-
-% lower
-thetaL(end+1,:) = inverseKinDynamixel(155,155,65,-pi/2,deg2rad(212))
-
-% drop it
-thetaL(end+1,:) = inverseKinDynamixel(155,155,65,-pi/2,deg2rad(95))
-
-%prepare
-thetaL(end+1,:) = inverseKinDynamixel(20,0,200,-pi/2,deg2rad(95))
-
+% % Rotate box grabbing from side
+% thetaL = [];
+% %prepare
+% thetaL(end+1,:) = inverseKinDynamixel(20,0,200,0,deg2rad(95))
+% % open at position
+% thetaL(end+1,:) = inverseKinDynamixel(225,0,45,0,deg2rad(95))
+% 
+% %closed on cube
+% thetaL(end+1,:) = inverseKinDynamixel(225,0,45,0,deg2rad(212))
+% 
+% % raise cube - tends to hit everything
+% thetaL(end+1,:) = inverseKinDynamixel(210,0,100,0,deg2rad(212))
+% 
+% % go to 3
+% thetaL(end+1,:) = inverseKinDynamixel(155,155,100,-pi/2,deg2rad(212))
+% 
+% % lower
+% thetaL(end+1,:) = inverseKinDynamixel(155,155,65,-pi/2,deg2rad(212))
+% 
+% % drop it
+% thetaL(end+1,:) = inverseKinDynamixel(155,155,65,-pi/2,deg2rad(95))
+% 
+% %prepare
+% thetaL(end+1,:) = inverseKinDynamixel(20,0,200,-pi/2,deg2rad(95))
+% 
 % POSITIONS OF ALL CUBES
 % 1) grids=(3,-8) - from side
 %   (75,-200,40,0,deg2rad(212))
@@ -253,15 +255,16 @@ thetaL(end+1,:) = inverseKinDynamixel(20,0,200,-pi/2,deg2rad(95))
 %   (100,0,50,-pi/2,deg2rad(212))
 % 6) grids = (0,4) - from top
 %   (0,100,50,-pi/2,deg2rad(212))
-for t=1:size(thetaL,1)
-    for i=1:length(DXL_LIST)
-        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, thetaL(t,i));
-    end
-    pause(2)
-end
+
+% for t=1:size(thetaL,1)
+%     for i=1:length(DXL_LIST)
+%         write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, thetaL(t,i));
+%     end
+%     pause(2)
+% end
 
 
-% Draw square
+%% Code snippet for Draw square
 % theta = inverseKinDynamixel(200,-100,50,theta_G,10)
 % for i=1:length(DXL_LIST)
 %     write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, theta(i));
@@ -282,6 +285,78 @@ end
 %     write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, theta(i));
 % end
 % pause(3);
+
+%% Code snippet for Line path sampling
+z=100;
+% Corners
+corners = [175 -100 z
+            175 100 z
+            225 100 z
+            225 -100 z];
+        
+corners = [ 125 190 z
+            100 200 z
+];
+
+"TIME BASED"
+        
+for j=1:size(corners, 1)
+    theta = inverseKinDynamixel(corners(j, 1), corners(j, 2), corners(j, 3), 0, deg2rad(95))
+    for i=1:length(DXL_LIST)
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, theta(i));
+    end
+    pause(2);
+end
+
+% "SAMPLING BASED"
+% 
+% thetaList = [];
+% 
+% posPath = genLineTraj(corners(1,:),corners(2,:));
+% 
+% for i=1:size(posPath,1)
+%     pos = posPath(i,:);
+%     theta = inverseKinDynamixel(pos(1),pos(2),pos(3),0,deg2rad(95));
+% %         coordFrames(theta);
+%     thetaList(end+1, :) = theta;
+% end
+% 
+% posPath = genLineTraj(corners(2,:),corners(3,:));
+% 
+% for i=1:size(posPath,1)
+%     pos = posPath(i,:);
+%     theta = inverseKinDynamixel(pos(1),pos(2),pos(3),0,deg2rad(95));
+% %         coordFrames(theta);
+%     thetaList(end+1, :) = theta;
+% end
+% 
+% posPath = genLineTraj(corners(3,:),corners(4,:));
+% 
+% for i=1:size(posPath,1)
+%     pos = posPath(i,:);
+%     theta = inverseKinDynamixel(pos(1),pos(2),pos(3),0,deg2rad(95));
+% %         coordFrames(theta);
+%     thetaList(end+1, :) = theta;
+% end
+% 
+% posPath = genLineTraj(corners(4,:),corners(1,:));
+% 
+% for i=1:size(posPath,1)
+%     pos = posPath(i,:);
+%     theta = inverseKinDynamixel(pos(1),pos(2),pos(3),0,deg2rad(95));
+% %         coordFrames(theta);
+%     thetaList(end+1, :) = theta;
+% end
+
+% for iteration=1:2
+%     for t=1:size(thetaList,1)
+%         for i=1:length(DXL_LIST)
+% %             thetaList(t, i)
+%             write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, thetaList(t,i));
+%         end
+% %         pause(0.05)
+%     end
+% end
 
 %% -- Dynamixel Cleanup Start -- %%
 for i=1:length(DXL_LIST)
