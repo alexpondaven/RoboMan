@@ -10,6 +10,10 @@ function IK_ErrorCodes(ec)
         disp('[IK] sin(theta3...) > 1.')
     case -2
         disp('[IK] sin(theta2...) > 1.')
+    case -3
+        disp('[IK] Joint angle out of bound.')
+    case -4
+        disp('[IK] Joint location out of bound.')
     otherwise
         fprintf('[IK] Unknown error code: %d\n', ec)
 

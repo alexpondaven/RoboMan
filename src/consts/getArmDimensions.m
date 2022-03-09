@@ -1,4 +1,4 @@
-function dimensions = armDimensions()
+function dimensions = getArmDimensions()
 % Returns the dimensions of the links of the robot arm.
 %
     dimensions.L1 = 128;
