@@ -80,7 +80,7 @@ src_z = initial_height + cube_height * state(src) + gripper_offset;
 dst_z = initial_height + cube_height * state(dst) + gripper_offset;
 
 % Get max z from state to determine how high to move
-max_height = initial_height + cube_height * max(state) + holder_offset;
+max_height = initial_height + cube_height * (1 + max(state)) + holder_offset;
 
 %% Path planning
 

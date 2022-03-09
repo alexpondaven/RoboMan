@@ -42,4 +42,8 @@ function theta = inverseKin(x,y,z,theta_G,gripSize)
 
     theta(5) = gripSize;
     
+    % check if any theta is out of bounds
+    
+    % Check where the rest of the joints are to prevent collision
+    
 end

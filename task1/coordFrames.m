@@ -42,6 +42,11 @@ joints(:,:,1) = T(:,:,1);
 % Apply transforms
 for i=2:size(T,3)
     joints(:,:,i) = joints(:,:,i-1) * T(:,:,i);
+    
+    % Check if joints are out of bounds
+    joint_xyz = joints(1:3,4,i);
+    retval = checkJointCollision(joint_xyz);
+    assert(retval==0, "Joint %d out of bounds", i);
 end
 
 %% Plot joints

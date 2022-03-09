@@ -45,11 +45,13 @@ function theta = inverseKinDynamixel(x,y,z,theta_G, gripSize)
 
         % Make sure theta is in range described by PARAMS
         if theta(i) > PARAMS(i).UB
-            fprintf("Angle %d of servo %d over upper bound\n", theta(i), i)
+            fprintf("Angle %04d of servo %d over upper bound\n", theta(i), i)
+            
             theta(i) = PARAMS(i).UB;
         end
         if theta(i) < PARAMS(i).LB
-            fprintf("Angle %d of servo %d under lower bound\n", theta(i), i)
+            fprintf("Angle %04d of servo %d under lower bound\n", theta(i), i)
+            
             theta(i) = PARAMS(i).LB;
         end
         
