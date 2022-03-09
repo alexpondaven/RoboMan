@@ -1,10 +1,11 @@
 function T_i = DHTransform(param)
-    % param.theta - rotation of joint
-    % param.a - previous joint length
-    % param.alpha - angle between joint axes
-    % param.d - distance between links along z
-%     theta = deg2rad(param.theta);
-%     alpha = deg2rad(param.alpha);
+% Args:
+% param.theta : rotation of joint
+% param.a     : previous joint length
+% param.alpha : angle between joint axes
+% param.d     : distance between links along z
+% Returns: 4x4 Transformation Matrix
+
     theta = param.theta;
     alpha = param.alpha;
     a = param.a;
