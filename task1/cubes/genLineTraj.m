@@ -1,5 +1,5 @@
 function posPath = genLineTraj(pos1,pos2)
-% GENTRAJ   generate trajectory between given points
+% GENTRAJ   sample points in line between pos1 and pos2 with sine wave
 %
 % Take into account velocity?
 %
