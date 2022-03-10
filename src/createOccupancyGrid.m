@@ -11,18 +11,12 @@ function occupancyGrid = createOccupancyGrid(cubeLocs, cubeHolderLocs)
     % has been occupied.
     
     %% Function parameters
-    xy_resolution = 25;      % resolution for each cube coordinate
-    XY_SCALING = 25;         % Each grid square is 25mm
-    CUBE_DIM = 25;           % in millimeters
-    HOLDER_DIM = 30;
-    HOLDER_HEIGHT = 15;      % Center of the cube when it is placed on a holder
+    ogParams = getOccupancyGridParams();
 
-    % THETA_G_LIST = -90:10:90;
-    % THETA_1_LIST = -90:5:90;
-    THETA_G_LIST = -90:45:90;
-    THETA_1_LIST = -90:45:90;
-    X_LIST = 0:xy_resolution:250;
-    Y_LIST = 0:xy_resolution:250;
+    THETA_G_LIST = ogParams.THETA_G_LIST;
+    THETA_1_LIST = ogParams.THETA_1_LIST;
+    X_LIST = ogParams.X_LIST;
+    Y_LIST = ogParams.Y_LIST;
 
     occupancyGrid = zeros( ...
         length(THETA_G_LIST), ...

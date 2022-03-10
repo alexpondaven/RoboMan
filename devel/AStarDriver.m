@@ -5,7 +5,7 @@
 % Wrap this into a function in the future that takes a list of cube and
 % cube holder locations (i,j)
 
-clear all
+clear
 
 cube_locs = [
     [3,-8, 0]
@@ -24,7 +24,7 @@ cube_hold = [
     [6, 6]
 ].';
 
-THETA_1_LIST = -90:45:90;
+THETA_1_LIST = getOccupancyGridParams().THETA_1_LIST;
 og = createOccupancyGrid(cube_locs, cube_hold);
 
 % for i=1:length(THETA_1_LIST)
