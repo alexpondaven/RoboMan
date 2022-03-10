@@ -1,4 +1,4 @@
-function coeffs = interpTraj(vias, Tend, isPlot)
+function [coeffs,T] = interpTraj(vias, Tend)
 % INTERPTRAJ    Cubic time-based interpolation between given via points
 %
 % A cubic is fit between every pair of via points with constraints:
@@ -20,7 +20,7 @@ dT = diff(T); % Even spacing of times at each via point
 
 
 % Interpolate for all 4 theta values (each column of vias)
-coeffs = []
+coeffs = [];
 for joint=1:4
     theta = vias(:,joint);
     
@@ -58,37 +58,6 @@ for joint=1:4
     % Solve
     coeffs = [coeffs linsolve(A,b)];
     
-    
-    if isPlot
-        subplot(2,2,joint)
-        dt = 0.01;
-        t = [];
-        interp = [];
-    
-        for j=1:k
-            i = 4*(j-1) + 1;
-            jt = 0:dt:dT(j);
-            jInterp = coeffs(i) + coeffs(i+1)*jt + coeffs(i+2)*jt.^2 + coeffs(i+3)*jt.^3;
-            jt = jt + T(j);
-            
-            t = [t jt];
-            interp = [interp jInterp];
-        end
-    
-        plot(t,interp,'k')
-        title("Theta " + joint)
-        xlabel("time")
-        ylabel("theta")
-        % Plot via points
-        hold on
-    
-        for via=1:k+1
-            hold on
-            plot(T(via), theta(via),'ro')
-        end
-        sgtitle("Cubic interpolation between via points")
-    end
-
 end
 
 end

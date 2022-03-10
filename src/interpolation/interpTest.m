@@ -21,8 +21,10 @@
 % linsolve(A,b)
 
 vias = [0 0 0 0
-        1 1 1 1
+        1 4 1 1
         2 2 2 2];
 Tend = 2;
 
-interpTraj(vias,Tend, 1)
+[coeffs, T] = interpTraj(vias,Tend)
+
+plotInterp(vias, coeffs, T)
