@@ -10,8 +10,9 @@ function jointPosErr = checkJointPositions(joints)
     JOINT_Z_OFFSET = 15;
     
     jointPosErr = zeros( length(joints), 'uint8' );
-
-    for idx=1:length(joints)
+    
+    % joint 1 is the origin, so it is fixed, doesn't need to be checked.
+    for idx=2:length(joints)
         joint_z = joints(3,idx);
         
         % TODO make other checks if necessary
