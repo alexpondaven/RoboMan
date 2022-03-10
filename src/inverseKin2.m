@@ -98,7 +98,7 @@ function [theta, ec] = inverseKin2(x,y,z,theta_G,gripOpen)
         if  (theta(idx) > ub) || (theta(idx) < lb)
 %             jointLimitErr(idx) = 1;
             fprintf("Theta %d angle %0.2f out of bounds. UB: %0.2f, LB: %0.2f\n",...
-                idx, rad2deg(theta(idx)), ub, lb);
+                idx, rad2deg(theta(idx)), rad2deg(ub), rad2deg(lb));
             ec = -3;
             return
         end
