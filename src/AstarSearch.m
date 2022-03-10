@@ -17,8 +17,8 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
     N_THETA_1_LIST = size(ogParams.THETA_1_LIST, 2);
 
     %% Convert start and end positions to grid coordinates
-    startIdx = cartesianToOGCoords(startPos);
-    goalIdx = cartesianToOGCoords(endPos);
+    startIdx = cartesianToOGCoords(startPos)
+    goalIdx = cartesianToOGCoords(endPos)
 
     %% Perform A* Search
 

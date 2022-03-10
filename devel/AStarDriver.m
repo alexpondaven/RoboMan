@@ -27,6 +27,11 @@ cube_hold = [
 THETA_1_LIST = getOccupancyGridParams().THETA_1_LIST;
 og = createOccupancyGrid(cube_locs, cube_hold);
 
+startPos = [ 50, -100, 50, -pi/2 ];
+endPos = [ 50, 100, 50, -pi/2 ];
+
+AstarSearch( startPos, endPos, og )
+
 % for i=1:length(THETA_1_LIST)
 %     fprintf("Occupancy grid for angle %d", THETA_1_LIST(i));
 %     squeeze( og(1,i,:,:) )

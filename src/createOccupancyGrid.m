@@ -17,6 +17,10 @@ function occupancyGrid = createOccupancyGrid(cubeLocs, cubeHolderLocs)
     THETA_1_LIST = ogParams.THETA_1_LIST;
     X_LIST = ogParams.X_LIST;
     Y_LIST = ogParams.Y_LIST;
+    XY_SCALING = ogParams.XY_SCALING;
+    CUBE_DIM = ogParams.CUBE_DIM;
+    HOLDER_HEIGHT = ogParams.HOLDER_HEIGHT;
+    HOLDER_DIM = ogParams.HOLDER_DIM;
 
     occupancyGrid = zeros( ...
         length(THETA_G_LIST), ...
@@ -108,7 +112,7 @@ function occupancyGrid = createOccupancyGrid(cubeLocs, cubeHolderLocs)
                     xVal = x * cos(theta_1);
                     yVal = x * sin(theta_1);
                     zVal = y;
-                    [thetas, ec] = inverseKin2(xVal, yVal, zVal, theta_g, false);
+                    [~, ec] = inverseKin2(xVal, yVal, zVal, theta_g, false);
                     if ec ~= 0
                         occupancyGrid(theta_g_idx, theta_1_idx, x_idx, y_idx) = 1;
 
