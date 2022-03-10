@@ -38,7 +38,7 @@ function [theta, ec] = inverseKin2(x,y,z,theta_G,gripOpen)
     % sin(theta3) + alpha
     s3_a = (x_^2 + y_^2 - L3^2 - L2^2 - L1^2)/(2*L3*R_3);
     if abs(s3_a) > 1
-        disp("invalid theta 3 value!")
+        % fprintf("invalid theta 3 value!\n")
         ec = -1;
         return
     end
@@ -48,11 +48,11 @@ function [theta, ec] = inverseKin2(x,y,z,theta_G,gripOpen)
     theta3_lb = jointBounds(1, 3);
     theta3_ub = jointBounds(2, 3);
     if (theta(3) > theta3_ub) || (theta(3) < theta3_lb)
-        fprintf("Previous theta(3) value %0.2f out of bounds. Attempting to convert to an elbow-down configuration.\n", ...
-            rad2deg( theta(3) ));
+        % fprintf("Previous theta(3) value %0.2f out of bounds. Attempting to convert to an elbow-down configuration.\n", ...
+            % rad2deg( theta(3) ));
         theta(3) = atan2(s3_a, -c3_a) - alpha_3;
-        fprintf("theta(3) elbow-down configuration: %0.2f\n", ...
-            rad2deg( theta(3) ));
+        % fprintf("theta(3) elbow-down configuration: %0.2f\n", ...
+        %     rad2deg( theta(3) ));
     end
     
     k1 = L2 + L3*cos(theta(3));
@@ -61,7 +61,7 @@ function [theta, ec] = inverseKin2(x,y,z,theta_G,gripOpen)
     R_2 = sqrt(k1^2 + k2^2);
     s2_a = y_/R_2;
     if abs(s2_a) > 1
-        disp("invalid theta 2 value!")
+        % fprintf("invalid theta 2 value!\n")
         ec = -2;
         return 
     end
@@ -72,11 +72,11 @@ function [theta, ec] = inverseKin2(x,y,z,theta_G,gripOpen)
     theta2_lb = jointBounds(1, 2);
     theta2_ub = jointBounds(2, 2);
     if (theta(2) > theta2_ub) || (theta(2) < theta2_lb)
-        fprintf("Previous theta(2) value %0.2f out of bounds. Attempting to convert to an elbow-down configuration.\n", ...
-            rad2deg( theta(2) ));
+        % fprintf("Previous theta(2) value %0.2f out of bounds. Attempting to convert to an elbow-down configuration.\n", ...
+            % rad2deg( theta(2) ));
         theta(2) = atan2(s2_a, -c2_a) - alpha_2;
-        fprintf("theta(2) elbow-down configuration: %0.2f\n", ...
-            rad2deg( theta(2) ));
+        % fprintf("theta(2) elbow-down configuration: %0.2f\n", ...
+            % rad2deg( theta(2) ));
     end
     
     theta(4) = theta_G - theta(2) - theta(3);
@@ -97,8 +97,8 @@ function [theta, ec] = inverseKin2(x,y,z,theta_G,gripOpen)
         ub = jointBounds(2, idx);
         if  (theta(idx) > ub) || (theta(idx) < lb)
 %             jointLimitErr(idx) = 1;
-            fprintf("Theta %d angle %0.2f out of bounds. UB: %0.2f, LB: %0.2f\n",...
-                idx, rad2deg(theta(idx)), rad2deg(ub), rad2deg(lb));
+            % fprintf("Theta %d angle %0.2f out of bounds. UB: %0.2f, LB: %0.2f\n",...
+            %     idx, rad2deg(theta(idx)), rad2deg(ub), rad2deg(lb));
             ec = -3;
             return
         end
@@ -111,8 +111,8 @@ function [theta, ec] = inverseKin2(x,y,z,theta_G,gripOpen)
     
     for idx=1:length(jointPosErr)
         if jointPosErr(idx) ~= 0
-            fprintf("Joint %d position out of bounds. x: %0.2f, y: %0.2f z: %0.2f\n",...
-                idx, joints(1, idx), joints(2, idx), joints(3, idx));
+            % fprintf("Joint %d position out of bounds. x: %0.2f, y: %0.2f z: %0.2f\n",...
+            %     idx, joints(1, idx), joints(2, idx), joints(3, idx));
             ec = -4;
             return
         end
