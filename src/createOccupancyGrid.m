@@ -13,7 +13,7 @@ function occupancyGrid = createOccupancyGrid(cubeLocs, cubeHolderLocs)
     %% Function parameters
     ogParams = getOccupancyGridParams();
 
-    THETA_G_LIST = ogParams.THETA_G_LIST;
+    % THETA_G_LIST = ogParams.THETA_G_LIST;
     THETA_1_LIST = ogParams.THETA_1_LIST;
     X_LIST = ogParams.X_LIST;
     Y_LIST = ogParams.Y_LIST;
