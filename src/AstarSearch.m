@@ -52,7 +52,9 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
     % cellInfo.fCost = scalar f-cost of reaching that particular goal
     % cellInfo.gCost = distance from start to current cell
     INITIAL_F_COST = 1e20; % Initialize an arbitrarily large f-cost
-    cellDetails = zeros( size(occupancyGrid) );
+    cellDetails.parentCoordinates = [];
+    cellDetails.fCost = [];
+    cellDetails.gCost = [];
     cellInfo.parentCoordinates = [-1, -1, -1, -1];
     cellInfo.fCost = INITIAL_F_COST;
     cellInfo.gCost = 0;
@@ -60,16 +62,19 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
         for t1_idx=1:N_THETA_1_LIST
             for x_idx=1:N_X_LIST
                 for y_idx=1:N_Y_LIST
-                    cellDetails(tg_idx, t1_idx, x_idx, y_idx) = cellInfo;
+                    cellDetails.parentCoordinates(tg_idx, t1_idx, x_idx, y_idx, :) = [-1, -1, -1, -1];
+                    cellDetails.fCost(tg_idx, t1_idx, x_idx, y_idx) = INITIAL_F_COST;
+                    cellDetails.gCost(tg_idx, t1_idx, x_idx, y_idx) = 0;
                 end
             end
         end
     end
     
     % Initialise starting element for traceback
-    cellDetails( startIdx(1), startIdx(2), startIdx(3), startIdx(4) ) = struct( ...
-        'parentCoordinates', startIdx, ...
-        'fCost', 0, 'gCost', 0);
+    cellDetails.parentCoordinates( startIdx(1), startIdx(2), startIdx(3), startIdx(4), : ) ...
+        = [startIdx(1), startIdx(2), startIdx(3), startIdx(4)];
+    cellDetails.fCost( startIdx(1), startIdx(2), startIdx(3), startIdx(4) ) = 0;
+    cellDetails.gCost( startIdx(1), startIdx(2), startIdx(3), startIdx(4) ) = 0;
 
     % Create openList of cellInfo structs.
     % It will be sorted based on the fCost of each cellInfo variable.
@@ -105,7 +110,11 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
                         curr_y = p_y + y_change;
                         
                         % [VALID_IF] If check that successor is valid and not the same as original
-                        if  ~(curr_theta_g==p_theta_g && curr_theta_1==p_theta_1 ...
+                        if  curr_theta_1 > 0 && curr_theta_1 <= N_THETA_1_LIST && ...   % bounds checking
+                            curr_theta_g > 0 && curr_theta_g <= N_THETA_G_LIST && ...
+                            curr_x > 0 && curr_x <= N_X_LIST && ...
+                            curr_y > 0 && curr_y <= N_Y_LIST && ...
+                            ~(curr_theta_g==p_theta_g && curr_theta_1==p_theta_1 ...
                             && curr_x==p_x && curr_y==p_y) && ...
                             ( occupancyGrid(curr_theta_g, curr_theta_1, curr_x, curr_y)==0 )
                             
@@ -121,8 +130,9 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
 
                                 % Traverse the path back and append to waypointIdx
                                 curr_index = [p_theta_g, p_theta_1, p_x, p_y];
-                                parent_coords = cellDetails(curr_index(1), curr_index(2), ...
-                                    curr_index(3), curr_index(4)).parentCoordinates;
+                                parent_coords = cellDetails.parentCoordinates( ...
+                                    curr_index(1), curr_index(2), ...
+                                    curr_index(3), curr_index(4), : );
 
                                 % Find start point by checking that its parent is the same as itself.
                                 % Compare element-wise if curr_index==parent_coords
@@ -130,8 +140,11 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
                                     waypointIdx(end+1, :) = parent_coords;     % append
                                     
                                     curr_index = parent_coords;
-                                    parent_coords = cellDetails(curr_index(1), curr_index(2), ...
-                                        curr_index(3), curr_index(4)).parentCoordinates;
+
+                                    parent_coords = cellDetails.parentCoordinates( ...
+                                        curr_index(1), curr_index(2), ...
+                                        curr_index(3), curr_index(4), : );
+
                                 end
                                 % Convert grid coordinates found in goal to cartesian coordinates                                waypoints = zeros(4, size(waypointIdx,2));
                                 for idx=1:size(waypointIdx,1)
@@ -152,7 +165,7 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
                                 
                                 % ii) else, compute both g and h for successor
                                 % successor.g = q.g + distance between successor and q
-                                curr_g = cellDetails( p_theta_g, p_theta_1, p_x, p_y ).gCost ...
+                                curr_g = cellDetails.gCost( p_theta_g, p_theta_1, p_x, p_y ) ...
                                 + rssq([theta_g_change, theta_1_change, x_change, y_change]);
                                 
                                 % successor.h = distance from goal to successor using heuristic
@@ -169,13 +182,16 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
                                 % iii) if the cell hasn't been expanded yet or has a 
                                 % higher f-cost than currently, update it
                                 % And add to the open list
-                                existing_f = cellDetails(curr_theta_g, curr_theta_1, curr_x, curr_y).fCost;
+                                existing_f = cellDetails.fCost(curr_theta_g, curr_theta_1, curr_x, curr_y);
                                 if existing_f == INITIAL_F_COST || existing_f > curr_f 
-                                    cellInfo.parentCoordinates = [p_theta_g, p_theta_1, p_x, p_y];
-                                    cellInfo.fCost = curr_f;
-                                    cellInfo.gCost = curr_g;
-
-                                    cellDetails(curr_theta_g, curr_theta_1, curr_x, curr_y) = cellInfo;
+                                    cellDetails.parentCoordinates(curr_theta_g, ...
+                                        curr_theta_1, curr_x, curr_y, :) = ...
+                                        [p_theta_g, p_theta_1, p_x, p_y];
+                                    cellDetails.fCost(curr_theta_g, ...
+                                        curr_theta_1, curr_x, curr_y) = curr_f;
+                                    cellDetails.gCost(curr_theta_g, ...
+                                        curr_theta_1, curr_x, curr_y) = curr_g;
+                                    
                                     openList(end+1) = struct( "fCost", curr_f, ...
                                         "coordinates", [curr_theta_g, curr_theta_1, curr_x, curr_y] );
                                 end
