@@ -1,4 +1,4 @@
-function checkJointCollision(jointPos)
+function ret = checkJointCollision(jointPos)
     JOINT_OFFSET = 20;
 
     joint_x = jointPos(1);
@@ -12,9 +12,10 @@ function checkJointCollision(jointPos)
 %         "Joint Y out of bounds"
 %     end
     if (joint_z > 250 || joint_z < 0 + JOINT_OFFSET)
-        "Joint Z out of bounds"
-        return -1;
+        disp("Joint Z out of bounds")
+        ret = -1;
+        return
     end
     
-    return 0;
+    ret = 0;
 end
