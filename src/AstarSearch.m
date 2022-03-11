@@ -39,12 +39,12 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
     % Check if goal == start
     if all( startIdx == goalIdx )
         disp('[A*] Start location and goal location are the same. Returning')
-        waypoints = [OGToCartesianCoords(startIdx)];
+        waypoints(1,:) = OGToCartesianCoords(startIdx);
         return
     end
 
     % Create closed list
-    closedList = zeros(size(occupancyGrid), 'uint8');
+    closedList = false(size(occupancyGrid), 'logical');
 
     % Create data structure to hold cell information
     % these have a structure defined by
@@ -55,9 +55,7 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
     cellDetails.parentCoordinates = [];
     cellDetails.fCost = [];
     cellDetails.gCost = [];
-    cellInfo.parentCoordinates = [-1, -1, -1, -1];
-    cellInfo.fCost = INITIAL_F_COST;
-    cellInfo.gCost = 0;
+    
     for tg_idx=1:N_THETA_G_LIST
         for t1_idx=1:N_THETA_1_LIST
             for x_idx=1:N_X_LIST
@@ -79,13 +77,16 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
     % Create openList of cellInfo structs.
     % It will be sorted based on the fCost of each cellInfo variable.
     startElement = struct( "fCost", 0, "coordinates", startIdx );
-    openList = [ startElement ];
+    openList(1) = startElement;
+    elemsInserted = false;      % Keep track of whether we need to sort openList again
 
     while( ~isempty(openList) )
 
         % Sort openList to get the node with the lowest f-cost
         % We do this by converting the array of structs into a table and sorting it.
-        openList = table2struct( sortrows( struct2table(openList), 'fCost' ) );
+        if length(openList) > 1 && elemsInserted
+            openList = table2struct( sortrows( struct2table(openList), 'fCost' ) );
+        end
 
         % Let the node with the lowest f-cost be our current node, p
         p = openList(1);
@@ -94,6 +95,7 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
         p_x = p.coordinates(3);
         p_y = p.coordinates(4);
         openList = openList(2:end);     % pop off first element of openList
+        elemsInserted = false;
 
         % Add this vertex to the closedList
         closedList( p_theta_g, p_theta_1, p_x, p_y ) = 1;
@@ -137,8 +139,7 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
                                 % Find start point by checking that its parent is the same as itself.
                                 % Compare element-wise if curr_index==parent_coords
                                 while( ~(all( curr_index==parent_coords ))  )
-                                    waypointIdx(end+1, :) = parent_coords;     % append
-                                    
+                                    waypointIdx(end+1, :) = parent_coords;                                    
                                     curr_index = parent_coords;
 
                                     parent_coords = cellDetails.parentCoordinates( ...
@@ -146,7 +147,8 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
                                         curr_index(3), curr_index(4), : );
 
                                 end
-                                % Convert grid coordinates found in goal to cartesian coordinates                                waypoints = zeros(4, size(waypointIdx,2));
+                                % Convert grid coordinates found in goal to cartesian coordinates
+                                waypoints = zeros(size(waypointIdx,2), 4);
                                 for idx=1:size(waypointIdx,1)
                                     waypoints(idx,:) = OGToCartesianCoords(waypointIdx(idx,:));
                                 end
@@ -194,9 +196,14 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
                                     
                                     openList(end+1) = struct( "fCost", curr_f, ...
                                         "coordinates", [curr_theta_g, curr_theta_1, curr_x, curr_y] );
+                                    
+                                    % fprintf("Inserted idx [%d %d %d %d]\n", curr_theta_g, curr_theta_1, curr_x, curr_y);
+                                    elemsInserted = true;
                                 end
                             end
                             % [ADD_TO_OPEN] 
+                        else
+                            % fprintf("Node at idx [%d %d %d %d] not expanded\n", curr_theta_g, curr_theta_1, curr_x, curr_y);
                         end
                         % [VALID_IF] end checking for validity
 
