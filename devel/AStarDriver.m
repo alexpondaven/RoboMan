@@ -38,7 +38,7 @@ disp('Created occupancy grid.')
 % TODO fix bugs in reachability analysis!!!
 
 startPos = [ 145, 50, 75, 0 ];
-endPos =   [ 45, 50, 45, -pi/2 ];
+endPos =   [ 145, 50, 45, -pi/2 ];
 
 t1 = now;
 waypoints = AstarSearch( startPos, endPos, og );
@@ -57,3 +57,8 @@ for i=1:size(waypoints,1)
 end
 
 visualisePath(waypoints, posPath)
+
+%% String it together with interpolation
+Tend = size(waypoints, 1);  % on average give 1 second per waypoint?
+[coeffs, T] = interpTraj(vias,Tend)
+plotInterp(vias, coeffs, T)
