@@ -23,6 +23,9 @@
 vias = [0 0 0 0
         1 4 1 1
         2 2 2 2];
+
+% vias = [[0:10]' [0:10]' [0:10]' [0:10]'];
+
 Tend = 2;
 
 [coeffs, T] = interpTraj(vias,Tend)

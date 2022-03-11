@@ -16,18 +16,27 @@ for joint=1:4
     dt = 0.01;
     t = [];
     interp = [];
+    v_interp = [];
+    a_interp = [];
 
     for j=1:k
         i = 4*(j-1) + 1;
         jt = 0:dt:dT(j);
         jInterp = coeffs(i,joint) + coeffs(i+1,joint)*jt + coeffs(i+2,joint)*jt.^2 + coeffs(i+3,joint)*jt.^3;
+        vInterp = coeffs(i+1,joint) + 2*coeffs(i+2,joint)*jt + 3*coeffs(i+3,joint)*jt.^2;
+        aInterp = 2*coeffs(i+2,joint) + 6*coeffs(i+3,joint)*jt;
         jt = jt + T(j);
         
         t = [t jt];
         interp = [interp jInterp];
+        v_interp = [v_interp vInterp];
+        a_interp = [a_interp aInterp];
     end
-
+    
     plot(t,interp,'k')
+    hold on
+    plot(t,v_interp,'r--')
+    plot(t,a_interp,'b--')
     title("Theta " + joint)
     xlabel("time")
     ylabel("theta")
