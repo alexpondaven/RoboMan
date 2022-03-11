@@ -7,10 +7,8 @@ function cartesianCoords = OGToCartesianCoords(ogIndices)
     % Returns:
     % cartesianCoords : (x, y, z, theta_g)
 
-    % TODO: Improve interpolation
-
     ogParams = getOccupancyGridParams();
-    
+
     xy_resolution = ogParams.xy_resolution; 
     THETA_G_LIST = ogParams.THETA_G_LIST;
     THETA_1_LIST = ogParams.THETA_1_LIST;
@@ -21,6 +19,9 @@ function cartesianCoords = OGToCartesianCoords(ogIndices)
     theta_1 = deg2rad( (ogIndices(2))*(THETA_1_LIST(2)-THETA_1_LIST(1)) + THETA_1_LIST(1) );
     theta_g = deg2rad( (ogIndices(1))*(THETA_G_LIST(2)-THETA_G_LIST(1)) + THETA_G_LIST(1) );
 
+    fprintf("[OGToCartesianCoords] x': %0.2f y': %0.2f, t_1: %0.2f, t_g: %0.2f\n", ...
+        xPrime, yPrime, rad2deg(theta_1), rad2deg(theta_g));
+    
     % convert x', y' theta_1 into x, y, z
     
     % Convert coordinates into grid cells
