@@ -32,44 +32,19 @@ og = createOccupancyGrid(cube_locs, cube_hold);
 
 disp('Created occupancy grid.')
 
-startPos = [ 50, -100, 50, -pi/2 ];
-endPos = [ 100, 50, 100, 0 ];
+% TODO fix bugs in reachability analysis!!!
+
+startPos = [ 100, -100, 50, -pi/2 ];
+endPos = [ 200, 100, 50, 0 ];
 
 waypoints = AstarSearch( startPos, endPos, og );
+waypoints = [startPos; waypoints; endPos];    % add in the start and end poses!
 
-% TODO: More robustly test A* driver code especially on manipulating cube
-
-plot3([0,250], [0,  0], [0,  0], 'r', 'LineWidth', 1.0)
-hold on
-plot3([0,  0], [0,250], [0,  0], 'g', 'LineWidth', 1.0)
-plot3([0,  0], [0,  0], [0,250], 'b', 'LineWidth', 1.0)
-plot3(startPos(1), startPos(2), startPos(3), 'gx', 'LineWidth', 2.0)
-plot3(endPos(1), endPos(2), endPos(3), 'rx', 'LineWidth', 2.0)
-axis([-50, 250, -250, 250, 0, 250])
-
-plot3(waypoints(:,1), waypoints(:,2), waypoints(:,3), 'kx-')
-
+posPath = zeros([ size(waypoints,1) ,5]);
 for i=1:size(waypoints,1)
-    
-    % Obtain transform of last joint (a bit hardcoded)
-    base = [ [1 0 0 waypoints(i, 1)];
-             [0 1 0 waypoints(i, 2)];
-             [0 0 1 waypoints(i, 3)];
-             [0 0 0 1              ] ];
-    trf0 =  getDHTransform(0, 0, pi/2, 0);
-    trf1 =  getDHTransform(pi + waypoints(i,4), 0, 0, 0);
-    trf2 =  getDHTransform(0, ARM_END, 0, 0);
-    loc = ((base*trf0)*trf1)*trf2;
-
-    plot3([waypoints(i,1), loc(1,4)], [waypoints(i,2), loc(2,4)], [waypoints(i,3), loc(3,4)], 'm.--')
-
+    posPath(i,:) = inverseKin2(waypoints(i,1), waypoints(i,2), waypoints(i,3), waypoints(i,4), true);
 end
 
-grid on
+visualisePath(waypoints, posPath)
 
-hold off
-
-% for i=1:length(THETA_1_LIST)
-%     fprintf("Occupancy grid for angle %d", THETA_1_LIST(i));
-%     squeeze( og(1,i,:,:) )
-% end
+% TODO: More robustly test A* driver code especially on manipulating cube
