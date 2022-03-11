@@ -26,11 +26,11 @@ function ogIndices = cartesianToOGCoords(cartesianCoords)
     % fprintf("[cartesianToOGCoords] x': %0.2f y': %0.2f, t_1: %0.2f, t_g: %0.2f\n", xPrime, yPrime, theta_1, theta_g);
     
     % Convert coordinates into grid cells
-    x_idx = round( (xPrime - X_LIST(1)) / xy_resolution );    % X_LIST(1) is the starting value of X_LIST
-    y_idx = round( (yPrime - Y_LIST(1)) / xy_resolution );    % Y_LIST(1) is the starting value of Y_LIST
+    x_idx = 1 + round( (xPrime - X_LIST(1)) / xy_resolution );    % X_LIST(1) is the starting value of X_LIST
+    y_idx = 1 + round( (yPrime - Y_LIST(1)) / xy_resolution );    % Y_LIST(1) is the starting value of Y_LIST
     % Resolution for theta_1 and theta_g is the distance in the array.
-    theta_1_idx = round( (theta_1-THETA_1_LIST(1)) / (THETA_1_LIST(2)-THETA_1_LIST(1)) );
-    theta_g_idx = round( (theta_g-THETA_G_LIST(1)) / (THETA_G_LIST(2)-THETA_G_LIST(1)) );
+    theta_1_idx = 1 + round( (theta_1-THETA_1_LIST(1)) / (THETA_1_LIST(2)-THETA_1_LIST(1)) );
+    theta_g_idx = 1 + round( (theta_g-THETA_G_LIST(1)) / (THETA_G_LIST(2)-THETA_G_LIST(1)) );
 
     ogIndices = [theta_g_idx, theta_1_idx, x_idx, y_idx];
 

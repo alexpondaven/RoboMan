@@ -14,10 +14,10 @@ function cartesianCoords = OGToCartesianCoords(ogIndices)
     THETA_1_LIST = ogParams.THETA_1_LIST;
     
     % convert indices to x', y', theta_1, theta_g
-    xPrime = (ogIndices(3)) * xy_resolution;
-    yPrime = (ogIndices(4)) * xy_resolution;
-    theta_1 = deg2rad( (ogIndices(2))*(THETA_1_LIST(2)-THETA_1_LIST(1)) + THETA_1_LIST(1) );
-    theta_g = deg2rad( (ogIndices(1))*(THETA_G_LIST(2)-THETA_G_LIST(1)) + THETA_G_LIST(1) );
+    xPrime = (ogIndices(3)-1) * xy_resolution;
+    yPrime = (ogIndices(4)-1) * xy_resolution;
+    theta_1 = deg2rad( (ogIndices(2)-1)*(THETA_1_LIST(2)-THETA_1_LIST(1)) + THETA_1_LIST(1) );
+    theta_g = deg2rad( (ogIndices(1)-1)*(THETA_G_LIST(2)-THETA_G_LIST(1)) + THETA_G_LIST(1) );
 
     % fprintf("[OGToCartesianCoords] x': %0.2f y': %0.2f, t_1: %0.2f, t_g: %0.2f\n", xPrime, yPrime, rad2deg(theta_1), rad2deg(theta_g));
     
