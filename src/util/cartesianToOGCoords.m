@@ -23,7 +23,7 @@ function ogIndices = cartesianToOGCoords(cartesianCoords)
     theta_1 = rad2deg( atan2( cartesianCoords(2), cartesianCoords(1) ));
     theta_g = rad2deg( cartesianCoords(4) );
 
-    fprintf("[cartesianToOGCoords] x': %0.2f y'Prime': %0.2f, t_1: %0.2f, t_g: %0.2f\n", ...
+    fprintf("[cartesianToOGCoords] x': %0.2f y': %0.2f, t_1: %0.2f, t_g: %0.2f\n", ...
         xPrime, yPrime, theta_1, theta_g);
     
     % Convert coordinates into grid cells
