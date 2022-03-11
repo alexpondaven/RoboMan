@@ -1,6 +1,6 @@
 % Test to check edge cases for the IK function (which sometimes seems to fail)
 
-goal = [45, 0, 45, -pi/2];
+goal = [145, 50, 75, 0];
 [theta, ec] = inverseKin2(goal(1), goal(2), goal(3), goal(4), true);
 rad2deg(theta)
 IK_ErrorCodes(ec);

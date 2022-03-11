@@ -37,13 +37,15 @@ disp('Created occupancy grid.')
 
 % TODO fix bugs in reachability analysis!!!
 
-startPos = [ 225, 0, 15, -pi/2 ];
-endPos =   [ 225, 0, 15, 0 ];
+startPos = [ 145, 50, 75, 0 ];
+endPos =   [ 45, 50, 45, -pi/2 ];
 
 t1 = now;
 waypoints = AstarSearch( startPos, endPos, og );
 t2 = now;
 t_astar = ((t2-t1)*24)*3600;
+
+% Longer paths can take up to a minute or more to generate. Be patient.
 
 fprintf("Took %0.2fs to generate occupancy grid and %0.2fs to perform A* search.\n\n", t_og, t_astar);
 
@@ -55,5 +57,3 @@ for i=1:size(waypoints,1)
 end
 
 visualisePath(waypoints, posPath)
-
-% TODO: More robustly test A* driver code especially on manipulating cube
