@@ -23,14 +23,14 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
     %% Perform A* Search
 
     % Check if start is valid
-    if occupancyGrid(startIdx(2), startIdx(3), startIdx(4)) == 1 || ~checkOGAdmissibility(startIdx)
+    if occupancyGrid(startIdx(2), startIdx(3), startIdx(4)) == 1 || ~checkOGAdmissibility(startIdx) || ~ogIsValid(startIdx)
         disp('[A*] Start location is occupied or invalid. Returning')
         waypoints = -1;
         return
     end
 
     % Check if goal is valid
-    if occupancyGrid(startIdx(2), startIdx(3), startIdx(4)) == 1 || ~checkOGAdmissibility(startIdx)
+    if occupancyGrid(goalIdx(2), goalIdx(3), goalIdx(4)) == 1 || ~checkOGAdmissibility(goalIdx) || ~ogIsValid(goalIdx)
         disp('[A*] Goal location is occupied or invalid. Returning')
         waypoints = -1;
         return
@@ -76,25 +76,30 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
 
     % Create openList of cellInfo structs.
     % It will be sorted based on the fCost of each cellInfo variable.
-    startElement = struct( "fCost", 0, "coordinates", startIdx );
-    openList(1) = startElement;
+    % startElement = struct( "fCost", 0, "coordinates", startIdx );
+    openList.fCost(1) = 0;
+    openList.coordinates(1,:) = startIdx;
     elemsInserted = false;      % Keep track of whether we need to sort openList again
 
     while( ~isempty(openList) )
 
         % Sort openList to get the node with the lowest f-cost
         % We do this by converting the array of structs into a table and sorting it.
-        if length(openList) > 1 && elemsInserted
-            openList = table2struct( sortrows( struct2table(openList), 'fCost' ) );
+        if length(openList.fCost) > 1 && elemsInserted
+            [openList.fCost, sortIdx] = sort(openList.fCost);
+            openList.coordinates = openList.coordinates(sortIdx, :);
+            % openList = table2struct( sortrows( struct2table(openList), 'fCost' ) );
         end
 
         % Let the node with the lowest f-cost be our current node, p
-        p = openList(1);
-        p_theta_g = p.coordinates(1);
-        p_theta_1 = p.coordinates(2);
-        p_x = p.coordinates(3);
-        p_y = p.coordinates(4);
-        openList = openList(2:end);     % pop off first element of openList
+        p = openList.coordinates(1,:);
+        p_theta_g = p(1);
+        p_theta_1 = p(2);
+        p_x = p(3);
+        p_y = p(4);
+        % pop off first element of openList
+        openList.fCost = openList.fCost(2:end);     
+        openList.coordinates = openList.coordinates(2:end, :);
         elemsInserted = false;
 
         % Add this vertex to the closedList
@@ -112,13 +117,10 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
                         curr_y = p_y + y_change;
                         
                         % [VALID_IF] If check that successor is valid and not the same as original
-                        if  curr_theta_1 > 0 && curr_theta_1 <= N_THETA_1_LIST && ...   % bounds checking
-                            curr_theta_g > 0 && curr_theta_g <= N_THETA_G_LIST && ...
-                            curr_x > 0 && curr_x <= N_X_LIST && ...
-                            curr_y > 0 && curr_y <= N_Y_LIST && ...
+                        if  ogIsValid([curr_theta_g, curr_theta_1, curr_x, curr_y]) && ...  % bounds checking
                             ~(curr_theta_g==p_theta_g && curr_theta_1==p_theta_1 ...
                             && curr_x==p_x && curr_y==p_y) && ...
-                            ( occupancyGrid( curr_theta_1, curr_x, curr_y)==0 ) && ...
+                            ( occupancyGrid(curr_theta_1, curr_x, curr_y)==0 ) && ...
                             checkOGAdmissibility([curr_theta_g, curr_theta_1, curr_x, curr_y])
                             
                             % [GOAL_IF] i) if successor is the goal, stop search
@@ -186,7 +188,7 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
                                 % higher f-cost than currently, update it
                                 % And add to the open list
                                 existing_f = cellDetails.fCost(curr_theta_g, curr_theta_1, curr_x, curr_y);
-                                if existing_f == INITIAL_F_COST || existing_f > curr_f 
+                                if existing_f == INITIAL_F_COST || existing_f >= curr_f 
                                     cellDetails.parentCoordinates(curr_theta_g, ...
                                         curr_theta_1, curr_x, curr_y, :) = ...
                                         [p_theta_g, p_theta_1, p_x, p_y];
@@ -195,8 +197,8 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
                                     cellDetails.gCost(curr_theta_g, ...
                                         curr_theta_1, curr_x, curr_y) = curr_g;
                                     
-                                    openList(end+1) = struct( "fCost", curr_f, ...
-                                        "coordinates", [curr_theta_g, curr_theta_1, curr_x, curr_y] );
+                                    openList.fCost(end+1) = curr_f;
+                                    openList.coordinates(end+1,:) = [curr_theta_g, curr_theta_1, curr_x, curr_y];
                                     
                                     % fprintf("Inserted idx [%d %d %d %d]\n", curr_theta_g, curr_theta_1, curr_x, curr_y);
                                     elemsInserted = true;
