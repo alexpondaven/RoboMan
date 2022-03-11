@@ -5,7 +5,7 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
 % Args:
 % startPos      : The starting position (x, y, z, theta_g) of the end effector.
 % endPos        : The goal position (x, y, z, theta_g) of the end effector.
-% occupancyGrid : 4D array of (theta_g, theta_1, x', y') configurations
+% occupancyGrid : 3D array of (theta_1, x', y') configurations
 % 
 % Returns:
 % waypoints : 2D array of (x, y, z, theta_g) angles.
@@ -23,15 +23,15 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
     %% Perform A* Search
 
     % Check if start is valid
-    if occupancyGrid(startIdx(1), startIdx(2), startIdx(3), startIdx(4)) == 1
-        disp('[A*] Start location is occupied. Returning')
+    if occupancyGrid(startIdx(2), startIdx(3), startIdx(4)) == 1 || ~checkOGAdmissibility(startIdx)
+        disp('[A*] Start location is occupied or invalid. Returning')
         waypoints = -1;
         return
     end
 
     % Check if goal is valid
-    if occupancyGrid(startIdx(1), startIdx(2), startIdx(3), startIdx(4)) == 1
-        disp('[A*] Goal location is occupied. Returning')
+    if occupancyGrid(startIdx(2), startIdx(3), startIdx(4)) == 1 || ~checkOGAdmissibility(startIdx)
+        disp('[A*] Goal location is occupied or invalid. Returning')
         waypoints = -1;
         return
     end
@@ -44,7 +44,7 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
     end
 
     % Create closed list
-    closedList = false(size(occupancyGrid), 'logical');
+    closedList = false([N_THETA_G_LIST, N_THETA_1_LIST, N_X_LIST, N_Y_LIST], 'logical');
 
     % Create data structure to hold cell information
     % these have a structure defined by
@@ -118,7 +118,8 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
                             curr_y > 0 && curr_y <= N_Y_LIST && ...
                             ~(curr_theta_g==p_theta_g && curr_theta_1==p_theta_1 ...
                             && curr_x==p_x && curr_y==p_y) && ...
-                            ( occupancyGrid(curr_theta_g, curr_theta_1, curr_x, curr_y)==0 )
+                            ( occupancyGrid( curr_theta_1, curr_x, curr_y)==0 ) && ...
+                            checkOGAdmissibility([curr_theta_g, curr_theta_1, curr_x, curr_y])
                             
                             % [GOAL_IF] i) if successor is the goal, stop search
                             if (curr_theta_g==goalIdx(1) && curr_theta_1==goalIdx(2) ...

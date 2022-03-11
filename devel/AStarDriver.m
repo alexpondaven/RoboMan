@@ -33,7 +33,7 @@ og = createOccupancyGrid(cube_locs, cube_hold);
 disp('Created occupancy grid.')
 
 startPos = [ 50, -100, 50, -pi/2 ];
-endPos = [ 100, 0, 100, 0 ];
+endPos = [ 100, 50, 100, 0 ];
 
 waypoints = AstarSearch( startPos, endPos, og );
 

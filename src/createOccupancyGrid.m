@@ -22,12 +22,11 @@ function occupancyGrid = createOccupancyGrid(cubeLocs, cubeHolderLocs)
     HOLDER_HEIGHT = ogParams.HOLDER_HEIGHT;
     HOLDER_DIM = ogParams.HOLDER_DIM;
 
-    occupancyGrid = false( ...
-        length(THETA_G_LIST), ...
+    occupancyGrid = zeros( ...
         length(THETA_1_LIST), ...
         length(X_LIST), ...
         length(Y_LIST), ...
-        'logical'...
+        'uint8'...
     );
 
     %% Create occupancy grid
@@ -60,16 +59,14 @@ function occupancyGrid = createOccupancyGrid(cubeLocs, cubeHolderLocs)
                        ((cube_theta1_ub >= theta_1)   && (cube_theta1_lb <= theta_1)  )
 
 %                         fprintf("cube ub: %0.2f | cube lb: %0.2f\n", rad2deg(cube_theta1_ub), rad2deg(cube_theta1_lb));
-                        % fprintf("cube at x': %0.2f y': %0.2f theta1: %0.2f (i:%d j: %d) collides\n", ...
-                        %     cube_xPrime, cube_yPrime, rad2deg(cube_theta1), cube(1), cube(2));
+%                         fprintf("cube at x': %0.2f y': %0.2f theta1: %0.2f (i:%d j: %d) collides\n", ...
+%                             cube_xPrime, cube_yPrime, rad2deg(cube_theta1), cube(1), cube(2));
 %                         fprintf("with current coordinates, x: %0.2f, y: %0.2f, theta1: %0.2f\n", ...
 %                             x, y, rad2deg(theta_1));
 %                         fprintf("Writing to occupancy grid indexes: %d %d %d\n\n", ...
 %                             theta_1_idx, y_idx, x_idx );
                         
-                        for theta_g_idx = 1:length(THETA_G_LIST)
-                            occupancyGrid(theta_g_idx, theta_1_idx, x_idx, y_idx) = 1;
-                        end
+                        occupancyGrid(theta_1_idx, x_idx, y_idx) = 1;
                     end
                 end
 
@@ -89,39 +86,38 @@ function occupancyGrid = createOccupancyGrid(cubeLocs, cubeHolderLocs)
                        ((holder_theta1_ub >= theta_1)   && (holder_theta1_lb <= theta_1)  )
 
 %                         fprintf("holder ub: %0.2f | lb: %0.2f\n", rad2deg(holder_theta1_ub), rad2deg(holder_theta1_lb));
-                        % fprintf("holder at x': %0.2f theta1: %0.2f (i:%d j: %d) collides\n", ...
-                        %     holder_xPrime, rad2deg(holder_theta1), holder(1), holder(2));
+%                         fprintf("holder at x': %0.2f theta1: %0.2f (i:%d j: %d) collides\n", ...
+%                             holder_xPrime, rad2deg(holder_theta1), holder(1), holder(2));
 %                         fprintf("with current coordinates, x: %0.2f, y: %0.2f, theta1: %0.2f\n", ...
 %                             x, y, rad2deg(theta_1));
 %                         fprintf("Writing to occupancy grid indexes %d %d %d\n\n", ...
 %                             theta_1_idx, y_idx, x_idx );
 
-                        for theta_g_idx = 1:length(THETA_G_LIST)
-                            occupancyGrid(theta_g_idx, theta_1_idx, x_idx, y_idx) = 1;
-                        end
+                        occupancyGrid(theta_1_idx, x_idx, y_idx) = 1;
                     end
                 end
 
-                % Check for admissibility
-                % Do IK here. If the current position cannot be
-                % reached then mark the occupancy grid position
-                % accordingly.
-                for theta_g_idx = 1:length(THETA_G_LIST)
-                    theta_g = deg2rad(THETA_G_LIST(theta_g_idx));
-                    % convert current x', y', theta1 value back to x, y, z
-                    xVal = x * cos(theta_1);
-                    yVal = x * sin(theta_1);
-                    zVal = y;
-                    [~, ec] = inverseKin2(xVal, yVal, zVal, theta_g, false);
-                    if ec ~= 0
-                        occupancyGrid(theta_g_idx, theta_1_idx, x_idx, y_idx) = 1;
+                %% admissibility check
+%                 % Check for admissibility
+%                 % Do IK here. If the current position cannot be
+%                 % reached then mark the occupancy grid position
+%                 % accordingly.
+%                 for theta_g_idx = 1:length(THETA_G_LIST)
+%                     theta_g = deg2rad(THETA_G_LIST(theta_g_idx));
+%                     % convert current x', y', theta1 value back to x, y, z
+%                     xVal = x * cos(theta_1);
+%                     yVal = x * sin(theta_1);
+%                     zVal = y;
+%                     [~, ec] = inverseKin2(xVal, yVal, zVal, theta_g, false);
+%                     if ec ~= 0
+%                         occupancyGrid(theta_g_idx, theta_1_idx, x_idx, y_idx) = 1;
 
-%                         fprintf("Position x: %0.2f y: %0.2f z: %0.2f unreachable with theta_g: %0.2f\n", ...
-%                             xVal, yVal, zVal, rad2deg(theta_g) );
-%                         fprintf("Writing to occupancy grid index %d %d %d %d\n\n", ...
-%                             theta_g_idx, theta_1_idx, y_idx, x_idx );
-                    end
-                end
+% %                         fprintf("Position x: %0.2f y: %0.2f z: %0.2f unreachable with theta_g: %0.2f\n", ...
+% %                             xVal, yVal, zVal, rad2deg(theta_g) );
+% %                         fprintf("Writing to occupancy grid index %d %d %d %d\n\n", ...
+% %                             theta_g_idx, theta_1_idx, y_idx, x_idx );
+%                     end
+%                 end
             end
         end
     end
