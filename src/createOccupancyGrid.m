@@ -13,7 +13,7 @@ function occupancyGrid = createOccupancyGrid(cubeLocs, cubeHolderLocs)
     %% Function parameters
     ogParams = getOccupancyGridParams();
 
-    THETA_G_LIST = ogParams.THETA_G_LIST;
+    % THETA_G_LIST = ogParams.THETA_G_LIST;
     THETA_1_LIST = ogParams.THETA_1_LIST;
     X_LIST = ogParams.X_LIST;
     Y_LIST = ogParams.Y_LIST;
@@ -23,7 +23,6 @@ function occupancyGrid = createOccupancyGrid(cubeLocs, cubeHolderLocs)
     HOLDER_DIM = ogParams.HOLDER_DIM;
 
     occupancyGrid = zeros( ...
-        length(THETA_G_LIST), ...
         length(THETA_1_LIST), ...
         length(X_LIST), ...
         length(Y_LIST), ...
@@ -67,9 +66,7 @@ function occupancyGrid = createOccupancyGrid(cubeLocs, cubeHolderLocs)
 %                         fprintf("Writing to occupancy grid indexes: %d %d %d\n\n", ...
 %                             theta_1_idx, y_idx, x_idx );
                         
-                        for theta_g_idx = 1:length(THETA_G_LIST)
-                            occupancyGrid(theta_g_idx, theta_1_idx, x_idx, y_idx) = 1;
-                        end
+                        occupancyGrid(theta_1_idx, x_idx, y_idx) = 1;
                     end
                 end
 
@@ -96,34 +93,32 @@ function occupancyGrid = createOccupancyGrid(cubeLocs, cubeHolderLocs)
 %                         fprintf("Writing to occupancy grid indexes %d %d %d\n\n", ...
 %                             theta_1_idx, y_idx, x_idx );
 
-                        for theta_g_idx = 1:length(THETA_G_LIST)
-                            occupancyGrid(theta_g_idx, theta_1_idx, x_idx, y_idx) = 1;
-                        end
+                        occupancyGrid(theta_1_idx, x_idx, y_idx) = 1;
                     end
                 end
 
-                % Check for admissibility
-                % Do IK here. If the current position cannot be
-                % reached then mark the occupancy grid position
-                % accordingly.
-                for theta_g_idx = 1:length(THETA_G_LIST)
-                    theta_g = deg2rad(THETA_G_LIST(theta_g_idx));
-                    % convert current x', y', theta1 value back to x, y, z
-                    xVal = x * cos(theta_1);
-                    yVal = x * sin(theta_1);
-                    zVal = y;
-                    [~, ec] = inverseKin2(xVal, yVal, zVal, theta_g, false);
-                    if ec ~= 0
-                        occupancyGrid(theta_g_idx, theta_1_idx, x_idx, y_idx) = 1;
+                %% admissibility check
+%                 % Check for admissibility
+%                 % Do IK here. If the current position cannot be
+%                 % reached then mark the occupancy grid position
+%                 % accordingly.
+%                 for theta_g_idx = 1:length(THETA_G_LIST)
+%                     theta_g = deg2rad(THETA_G_LIST(theta_g_idx));
+%                     % convert current x', y', theta1 value back to x, y, z
+%                     xVal = x * cos(theta_1);
+%                     yVal = x * sin(theta_1);
+%                     zVal = y;
+%                     [~, ec] = inverseKin2(xVal, yVal, zVal, theta_g, false);
+%                     if ec ~= 0
+%                         occupancyGrid(theta_g_idx, theta_1_idx, x_idx, y_idx) = 1;
 
-%                         fprintf("Position x: %0.2f y: %0.2f z: %0.2f unreachable with theta_g: %0.2f\n", ...
-%                             xVal, yVal, zVal, rad2deg(theta_g) );
-%                         fprintf("Writing to occupancy grid index %d %d %d %d\n\n", ...
-%                             theta_g_idx, theta_1_idx, y_idx, x_idx );
-                    end
-                end
+% %                         fprintf("Position x: %0.2f y: %0.2f z: %0.2f unreachable with theta_g: %0.2f\n", ...
+% %                             xVal, yVal, zVal, rad2deg(theta_g) );
+% %                         fprintf("Writing to occupancy grid index %d %d %d %d\n\n", ...
+% %                             theta_g_idx, theta_1_idx, y_idx, x_idx );
+%                     end
+%                 end
             end
         end
     end
-
 end

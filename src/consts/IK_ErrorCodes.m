@@ -14,6 +14,8 @@ function IK_ErrorCodes(ec)
         disp('[IK] Joint angle out of bound.')
     case -4
         disp('[IK] Joint location out of bound.')
+    case -5
+        disp('[IK] calculated final joint position does not match up with joint target.')
     otherwise
         fprintf('[IK] Unknown error code: %d\n', ec)
 

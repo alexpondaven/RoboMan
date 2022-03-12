@@ -6,6 +6,7 @@
 % cube holder locations (i,j)
 
 clear
+clc
 
 cube_locs = [
     [3,-8, 0]
@@ -25,14 +26,39 @@ cube_hold = [
 ].';
 
 THETA_1_LIST = getOccupancyGridParams().THETA_1_LIST;
+ARM_END = getArmDimensions().L4;
+
+t1 = now;
 og = createOccupancyGrid(cube_locs, cube_hold);
+t2 = now;
+t_og = ((t2-t1)*24)*3600;
 
-startPos = [ 50, -100, 50, -pi/2 ];
-endPos = [ 50, 100, 50, -pi/2 ];
+disp('Created occupancy grid.')
 
-AstarSearch( startPos, endPos, og )
+% TODO fix bugs in reachability analysis!!!
 
-% for i=1:length(THETA_1_LIST)
-%     fprintf("Occupancy grid for angle %d", THETA_1_LIST(i));
-%     squeeze( og(1,i,:,:) )
-% end
+startPos = [ 145, 50, 75, 0 ];
+endPos =   [ 145, 50, 45, -pi/2 ];
+
+t1 = now;
+waypoints = AstarSearch( startPos, endPos, og );
+t2 = now;
+t_astar = ((t2-t1)*24)*3600;
+
+% Longer paths can take up to a minute or more to generate. Be patient.
+
+fprintf("Took %0.2fs to generate occupancy grid and %0.2fs to perform A* search.\n\n", t_og, t_astar);
+
+waypoints = [startPos; waypoints; endPos];    % add in the start and end poses!
+
+posPath = zeros([ size(waypoints,1) ,5]);
+for i=1:size(waypoints,1)
+    posPath(i,:) = inverseKin2(waypoints(i,1), waypoints(i,2), waypoints(i,3), waypoints(i,4), true);
+end
+
+visualisePath(waypoints, posPath)
+
+%% String it together with interpolation
+Tend = size(waypoints, 1);  % on average give 1 second per waypoint?
+[coeffs, T] = interpTraj(vias,Tend)
+plotInterp(vias, coeffs, T)
