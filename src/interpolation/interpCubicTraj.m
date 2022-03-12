@@ -1,4 +1,4 @@
-function [coeffs,T] = interpTraj(vias, Tend)
+function [coeffs,T] = interpCubicTraj(vias, Tend)
 % INTERPTRAJ    Cubic time-based interpolation between given via points
 %
 % A cubic is fit between every pair of via points with constraints:
@@ -56,7 +56,7 @@ for joint=1:4
     A(4*k-1, 2) = 1;
     
     % Solve
-    coeffs = [coeffs linsolve(A,b)];
+    coeffs = [coeffs pinv(A)*b];
     
 end
 

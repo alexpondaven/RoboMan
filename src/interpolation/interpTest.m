@@ -20,14 +20,25 @@
 % 
 % linsolve(A,b)
 
+% vias = [0 0 0 0
+%         1 4 1 1
+%         2 2 2 2];
+
 vias = [0 0 0 0
-        1 4 1 1
-        2 2 2 2];
+        1 4 9 1
+        2 5 2 2
+        8 2 4 6];
 
 % vias = [[0:10]' [0:10]' [0:10]' [0:10]'];
 
 Tend = 2;
 
-[coeffs, T] = interpTraj(vias,Tend)
+%% Cubic Interpolation
+% [coeffs, T] = interpCubicTraj(vias,Tend)
+% 
+% plotCubicInterp(vias, coeffs, T)
 
-plotInterp(vias, coeffs, T)
+%% Quintic Interpolation
+[coeffs, T] = interpQuinticTraj(vias,Tend)
+
+plotQuinticInterp(vias, coeffs, T)

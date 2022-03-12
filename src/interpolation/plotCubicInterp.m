@@ -1,4 +1,4 @@
-function plotInterp(vias, coeffs, T)
+function plotCubicInterp(vias, coeffs, T)
 % PLOTINTERP    Plot cubic interpolation of via points from cubic
 % coefficients of each segment.
 %
