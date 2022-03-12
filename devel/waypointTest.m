@@ -23,59 +23,15 @@ if ~libisloaded(lib_name)
     [notfound, warnings] = loadlibrary(lib_name, 'dynamixel_sdk.h', 'addheader', 'port_handler.h', 'addheader', 'packet_handler.h');
 end
 
-% ---- Control Table Addresses ---- %%
-
-ADDR_PRO_TORQUE_ENABLE       = 64;           % Control table address is different in Dynamixel model
-ADDR_PRO_GOAL_POSITION       = 116; 
-ADDR_PRO_PRESENT_POSITION    = 132; 
-ADDR_PRO_OPERATING_MODE      = 11;
-ADDR_PRO_DRIVE_MODE          = 10;
-
-ADDR_PRO_GOAL_VELOCITY       = 104;
-ADDR_PRO_PROFILE_VELOCITY    = 112;
-
-
-
-% ---- Other Settings ---- %%
-
-% Protocol version
-PROTOCOL_VERSION            = 2.0;          % See which protocol version is used in the Dynamixel
-
-% Default setting
-DXL_LIST = [11,12,13,14,15];
-BAUDRATE                    = 1000000;
-DEVICENAME                  = 'COM10';       % Check which port is being used on your controller
-                                            % ex) Windows: 'COM1'   Linux: '/dev/ttyUSB0' Mac: '/dev/tty.usbserial-*'
-                                            
-TORQUE_ENABLE               = 1;            % Value for enabling the torque
-TORQUE_DISABLE              = 0;            % Value for disabling the torque
-DXL_MINIMUM_POSITION_VALUE  = -150000;      % Dynamixel will rotate between this value
-DXL_MAXIMUM_POSITION_VALUE  = 150000;       % and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
-DXL_MOVING_STATUS_THRESHOLD = 20;           % Dynamixel moving status threshold
-
-ESC_CHARACTER               = 'e';          % Key for escaping loop
-
-COMM_SUCCESS                = 0;            % Communication Success result value
-COMM_TX_FAIL                = -1001;        % Communication Tx Failed
-
-% ----- SET MOTION LIMITS ----------- %%
-ADDR_MAX_POS = 48;
-ADDR_MIN_POS = 52;
-MAX_POS = 3400;
-MIN_POS = 600;
-% ---------------------------------- %%
-
-% Initialize PortHandler Structs
-% Set the port path
-% Get methods and members of PortHandlerLinux or PortHandlerWindows
-port_num = portHandler(DEVICENAME);
+params = getDXLParams();
+port_num = portHandler(params.DEVICENAME);
 
 % Initialize PacketHandler Structs
 packetHandler();
 
 index = 1;
-dxl_comm_result = COMM_TX_FAIL;           % Communication result
-dxl_goal_position = [DXL_MINIMUM_POSITION_VALUE DXL_MAXIMUM_POSITION_VALUE];         % Goal position
+dxl_comm_result = params.COMM_TX_FAIL;           % Communication result
+dxl_goal_position = [params.DXL_MINIMUM_POSITION_VALUE params.DXL_MAXIMUM_POSITION_VALUE];         % Goal position
 
 dxl_error = 0;                              % Dynamixel error
 dxl_present_position = 0;                   % Present position
@@ -93,7 +49,7 @@ end
 
 
 % Set port baudrate
-if (setBaudRate(port_num, BAUDRATE))
+if (setBaudRate(port_num, params.BAUDRATE))
     fprintf('Baudrate Set\n');
 else
     unloadlibrary(lib_name);
@@ -102,38 +58,9 @@ else
     return;
 end
 
-%% Initialize all dynamixels
-servoLimits = getServoLimits();
-
-for i=1:length(DXL_LIST)
-    % Put actuator into Position Control Mode
-    write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_OPERATING_MODE, 3);
-    % Set max position limit
-    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_MAX_POS, servoLimits(i,2));
-    % Set min position limit
-    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_MIN_POS, servoLimits(i,1));
-    % Set Dynamixel Torque
-    write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_TORQUE_ENABLE, TORQUE_ENABLE);
-
-    % Set profile velocity - smoother motion
-    % write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_PROFILE_VELOCITY, 1024);
-    % Profile acceleration
-
-    dxl_comm_result = getLastTxRxResult(port_num, PROTOCOL_VERSION);
-    dxl_error = getLastRxPacketError(port_num, PROTOCOL_VERSION);
-    
-    if dxl_comm_result ~= COMM_SUCCESS
-        fprintf('%s\n', getTxRxResult(PROTOCOL_VERSION, dxl_comm_result));
-    elseif dxl_error ~= 0
-        fprintf('%s\n', getRxPacketError(PROTOCOL_VERSION, dxl_error));
-    else
-        fprintf('Dynamixel %d has been successfully connected \n', i);
-    end
-
-end
+initDynamixels(port_num);
 
 %% Code snippet for testing
-%% Code snippet for Line path sampling
 z=90;
 % Corners
 
@@ -147,7 +74,7 @@ square(5,:) = square(1,:);  % make it complete the square
 
 % interpolate lines between corners
 corners = [];
-numPoints = 100;
+numPoints = 5;
 for i=2:length(square)
     corners = [corners; linearInterpolate(square(i-1,:), square(i,:), numPoints) ];
 end
@@ -174,31 +101,41 @@ for j=1:size(corners, 1)
     GRIP_ANGLE = theta(5);
     vias = [vias; theta(1:4)];
 end
-Tend = 30;
-
-vias
+Tend = 15;
 
 % Interpolate between waypoints
-[coeffs, T] = interpTraj(vias, Tend);
+[coeffs, T] = interpQuinticTraj(vias, Tend);
+
+plotQuinticInterp(vias, coeffs, T)
 
 disp("TIME BASED");
 start = now;
 
 curr_servo_theta = zeros(1,5);
 disp("Goal Theta");
+init_theta = [vias(1,:) GRIP_ANGLE]
 goal_theta = [vias(end,:) GRIP_ANGLE]
+vel_hist = [];
+
+% Change to position control mode and get to start position
+setServoMode('pos', port_num);
+writeToServos(init_theta, 'pos', port_num);
 
 % want to ensure we don't end up with a deadzone
 % while(~all( abs(curr_servo_theta(1:4)-goal_theta(1:4)) < 50  ))
+
+% Change to velocity control mode and get to end position
+setServoMode('vel', port_num);
 while 1
     curTime = (now - start) * 24*60*60; % Fractional part of `now` is 24hrs
                                         % we want to get current time in seconds
     if curTime<Tend
-        theta = [sampleCubic(coeffs, T, curTime) GRIP_ANGLE];
+        % theta = [sampleQuintic(coeffs, T, curTime) GRIP_ANGLE];
+        theta = cast([sampleQuinticVel(coeffs, T, curTime) 0], 'uint32')
     else
         % Clip to final theta position
-        theta = [vias(end,:) GRIP_ANGLE];
-        break
+        % theta = [vias(end,:) GRIP_ANGLE];
+        theta = [0 0 0 0 0];
     end
 
     % fprintf("Commanded Pos at t:%0.2f | t_1: %0.1f | t_2: %0.1f | t_3: %0.1f | t_4: %0.1f | t_5: %0.1f\n", ...
@@ -206,24 +143,39 @@ while 1
     % fprintf("Current Position         | t_1: %0.1f | t_2: %0.1f | t_3: %0.1f | t_4: %0.1f | t_5: %0.1f\n\n", ...
     %     curr_servo_theta(1), curr_servo_theta(2), curr_servo_theta(3), ...
     %     curr_servo_theta(4), curr_servo_theta(5));
+    
+    writeToServos(theta, 'vel', port_num);
 
-    for i=1:length(DXL_LIST)
-        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_GOAL_POSITION, theta(i));
-        % curr_servo_theta(i) = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_PRESENT_POSITION);
+    joint_vel = zeros(1,5);
+    for i=1:length(params.DXL_LIST)
+        joint_vel(i) = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_VELOCITY);
+    end
+    
+    vel_hist = [vel_hist; joint_vel];
+    
+    if curTime >= Tend
+        break
     end
 end
 
+% Change to position control mode and get to end position
+setServoMode('pos', port_num);
+writeToServos(goal_theta, 'pos', port_num);
+
+
+vel_hist
+
 
 %% -- Dynamixel Cleanup Start -- %%
-for i=1:length(DXL_LIST)
+for i=1:length(params.DXL_LIST)
     % Disable Dynamixel Torque
 %     write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_TORQUE_ENABLE, TORQUE_DISABLE);
-    dxl_comm_result = getLastTxRxResult(port_num, PROTOCOL_VERSION);
-    dxl_error = getLastRxPacketError(port_num, PROTOCOL_VERSION);
-    if dxl_comm_result ~= COMM_SUCCESS
-        fprintf('%s\n', getTxRxResult(PROTOCOL_VERSION, dxl_comm_result));
+    dxl_comm_result = getLastTxRxResult(port_num, params.PROTOCOL_VERSION);
+    dxl_error = getLastRxPacketError(port_num, params.PROTOCOL_VERSION);
+    if dxl_comm_result ~= params.COMM_SUCCESS
+        fprintf('%s\n', getTxRxResult(params.PROTOCOL_VERSION, dxl_comm_result));
     elseif dxl_error ~= 0
-        fprintf('%s\n', getRxPacketError(PROTOCOL_VERSION, dxl_error));
+        fprintf('%s\n', getRxPacketError(params.PROTOCOL_VERSION, dxl_error));
     end
 end
 
@@ -235,4 +187,4 @@ fprintf('Port Closed \n');
 unloadlibrary(lib_name);
 
 % close all;
-clear all;
+clear
