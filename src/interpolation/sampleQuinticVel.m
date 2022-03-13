@@ -1,4 +1,4 @@
-function theta = sampleQuinticVel(coeffs, T, curTime)
+function [theta, target] = sampleQuinticVel(coeffs, T, curTime)
     % SampleQuinticVel Sample the velocity of the quintic interpolation at time `curTime`
     % 
     % ARGS
@@ -8,9 +8,11 @@ function theta = sampleQuinticVel(coeffs, T, curTime)
     %
     % RETURN
     % theta     : Theta values sampled at curTime
+    % target    : Next via point
     
     % Detect which segment it is in
     seg = find(T>curTime,1)-1;
+    target = seg + 1;
     dT = curTime - T(seg);
     
     % Sample vel

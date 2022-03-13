@@ -1,4 +1,4 @@
-function theta = sampleQuintic(coeffs, T, curTime)
+function [theta, target] = sampleQuintic(coeffs, T, curTime)
     % SAMPLEQUINTIC   Sample the quintic interpolation at time `curTime`
     % 
     % ARGS
@@ -8,9 +8,11 @@ function theta = sampleQuintic(coeffs, T, curTime)
     %
     % RETURN
     % theta     : Theta values sampled at curTime
+    % target    : Next via point
 
     % Detect which segment it is in
     seg = find(T>curTime,1)-1;
+    target = seg + 1;
     dT = curTime - T(seg);
 
 % Sample quintic
