@@ -28,7 +28,7 @@ function params = getDXLParams()
     
     % Default setting
     params.DXL_LIST = [11,12,13,14,15];
-    params.BAUDRATE                    = 1000000;
+    params.BAUDRATE                    = 4500000;
     params.DEVICENAME                  = 'COM9';       % Check which port is being used on your controller
     
     params.TORQUE_ENABLE               = 1;            % Value for enabling the torque
