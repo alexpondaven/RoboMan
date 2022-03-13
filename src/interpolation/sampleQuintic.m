@@ -1,5 +1,5 @@
 function theta = sampleQuintic(coeffs, T, curTime)
-% SAMPLECUBIC   Sample the quintic interpolation at time `curTime`
+% SAMPLEQUINTIC   Sample the quintic interpolation at time `curTime`
 % 
 % ARGS
 % coeffs    : Coefficients of quintic for each theta and segment
@@ -13,7 +13,7 @@ function theta = sampleQuintic(coeffs, T, curTime)
 seg = find(T>curTime,1)-1;
 dT = curTime - T(seg);
 
-% Sample cubic
+% Sample quintic
 row = 6*(seg-1)+1;
 theta = coeffs(row,:) + coeffs(row+1,:)*dT + coeffs(row+2,:)*dT^2 + coeffs(row+3,:)*dT^3 ...
         + coeffs(row+3,:)*dT^4 + coeffs(row+4,:)*dT^5;

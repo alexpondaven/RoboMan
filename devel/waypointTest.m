@@ -28,14 +28,8 @@ port_num = portHandler(params.DEVICENAME);
 
 % Initialize PacketHandler Structs
 packetHandler();
-
-index = 1;
 dxl_comm_result = params.COMM_TX_FAIL;           % Communication result
-dxl_goal_position = [params.DXL_MINIMUM_POSITION_VALUE params.DXL_MAXIMUM_POSITION_VALUE];         % Goal position
-
 dxl_error = 0;                              % Dynamixel error
-dxl_present_position = 0;                   % Present position
-
 
 % Open port
 if (openPort(port_num))
@@ -47,7 +41,6 @@ else
     return;
 end
 
-
 % Set port baudrate
 if (setBaudRate(port_num, params.BAUDRATE))
     fprintf('Baudrate Set\n');
@@ -58,7 +51,10 @@ else
     return;
 end
 
-initDynamixels(port_num);
+% Check for error in initializing dynamixels
+if initDynamixels(port_num) ~= 0
+    return
+end
 
 %% Code snippet for testing
 z=90;
