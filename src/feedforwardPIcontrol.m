@@ -11,7 +11,7 @@ function [jointVel, errorIntegral] = feedforwardPIcontrol(desiredVel, error, pre
 % errorIntegral : summing prevError and error
 
     Kp = 1;
-    Ki = 1;     % Kp and Ki are scalars with values to be tuned
+    Ki = 0;     % Kp and Ki are scalars with values to be tuned
 
     errorIntegral = prevError + error;
     jointVel = desiredVel + Kp*error + Ki*errorIntegral;

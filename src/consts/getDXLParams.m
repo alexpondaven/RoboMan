@@ -1,4 +1,4 @@
-function params = getDXLParams(port_num)
+function params = getDXLParams()
 
     % ---- Control Table Addresses ---- %%
     params.ADDR_PRO_TORQUE_ENABLE       = 64;           % Control table address is different in Dynamixel model

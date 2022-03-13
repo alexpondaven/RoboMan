@@ -33,9 +33,12 @@ function status = initDynamixels(port_num, mode)
         % Disable Dynamixel torque to write settings to it
         write1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_TORQUE_ENABLE, 0);
 
-        % Put actuator into Position Control Mode
+        % Put actuator into Control Mode
         write1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_OPERATING_MODE, MODE(i));
         
+        % Ensure that goal velocity is 0
+        write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_GOAL_VELOCITY, 0);
+
         % Set max position limit
         write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_MAX_POS, servoLimits(i,2));
         % Set min position limit

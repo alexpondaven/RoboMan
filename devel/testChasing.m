@@ -98,9 +98,9 @@ for j=1:size(corners, 1)
     vias = [vias; theta(1:4)];
 end
 Tend = 15;
+
 % Interpolate between waypoints
-T = assignViaTimes(vias, Tend);
-coeffs = interpQuinticTraj(vias, T);
+[coeffs, T] = interpQuinticTraj(vias, Tend);
 
 plotQuinticInterp(vias, coeffs, T)
 
@@ -110,20 +110,7 @@ start = now;
 disp("Goal Theta");
 init_theta = [vias(1,:) GRIP_ANGLE]
 goal_theta = [vias(end,:) GRIP_ANGLE]
-vel_hist = [];
 
-% Change to position control mode and get to start position
-% setServoMode('pos', port_num);
-% writeToServos(init_theta, 'pos', port_num);
-
-% want to ensure we don't end up with a deadzone
-% while(~all( abs(curr_servo_theta(1:4)-goal_theta(1:4)) < 50  ))
-
-% We want initial values
-curr_servo_theta = zeros(1,5);
-for i=1:length(params.DXL_LIST)
-    curr_servo_theta(i) = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_GOAL_POSITION);
-end
 
 % Change to velocity control mode and get to end position
 setServoMode('pos', port_num);
@@ -133,50 +120,28 @@ while 1
                                         % we want to get current time in seconds
     if curTime<(Tend)
         % ~ IF ATTEMPTING POS MODE
+
+        % Sample quintic ahead of current time, to make sure it isn't reached
         theta = [sampleQuintic(coeffs, T, curTime*1.1) GRIP_ANGLE];
-        % theta = cast([sampleQuinticVel(coeffs, T, curTime) 0], 'uint32')
-        
-        % ~ IF ATTEMPTING VELOCITY MODE
-        % theta = sampleQuintic(coeffs, T, curTime);
-        % desiredTraj = curr_servo_theta(1:4) - theta; % this is essentially P control
-        % desiredTraj = [cast(desiredTraj, 'uint32') 0]
 
     else
         % Clip to final theta position
         theta = [vias(end,:) GRIP_ANGLE];
-        % theta = [0 0 0 0 0];
 
-        % desiredTraj = [0 0 0 0 0];
     end
 
-    % fprintf("Commanded Pos at t:%0.2f | t_1: %0.1f | t_2: %0.1f | t_3: %0.1f | t_4: %0.1f | t_5: %0.1f\n", ...
-    %     curTime, theta(1), theta(2), theta(3), theta(4), theta(5)    );
-    % fprintf("Current Position         | t_1: %0.1f | t_2: %0.1f | t_3: %0.1f | t_4: %0.1f | t_5: %0.1f\n\n", ...
-    %     curr_servo_theta(1), curr_servo_theta(2), curr_servo_theta(3), ...
-    %     curr_servo_theta(4), curr_servo_theta(5));
-    
-    % writeToServos(desiredTraj, 'vel', port_num);
     writeToServos(theta, 'pos', port_num);
 
     joint_vel = zeros(1,5);
     for i=1:length(params.DXL_LIST)
         joint_vel(i) = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_VELOCITY);
-        % curr_servo_theta(i) = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_GOAL_POSITION);
     end
-    
-    vel_hist = [vel_hist; joint_vel];
     
     if curTime >= Tend
         break
     end
 end
 
-% Change to position control mode and get to end position
-% setServoMode('pos', port_num);
-% writeToServos(goal_theta, 'pos', port_num);
-
-
-vel_hist
 
 
 %% -- Dynamixel Cleanup Start -- %%
