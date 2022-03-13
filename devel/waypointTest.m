@@ -52,7 +52,7 @@ else
 end
 
 % Check for error in initializing dynamixels
-if initDynamixels(port_num) ~= 0
+if initDynamixels(port_num, 'vel') ~= 0
     return
 end
 
@@ -98,9 +98,9 @@ for j=1:size(corners, 1)
     vias = [vias; theta(1:4)];
 end
 Tend = 15;
-
 % Interpolate between waypoints
-[coeffs, T] = interpQuinticTraj(vias, Tend);
+T = assignViaTimes(vias, Tend);
+coeffs = interpQuinticTraj(vias, T);
 
 plotQuinticInterp(vias, coeffs, T)
 
