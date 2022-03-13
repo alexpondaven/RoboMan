@@ -7,6 +7,6 @@ function servoLimits = getServoLimits()
     servoLimits(4, :) = [deg2rad(80), deg2rad(300)]; 
     servoLimits(5, :) = [deg2rad(90), deg2rad(232)]; 
 
-    servoLimits = servoLimits.*(2048/pi);
+    servoLimits = cast(servoLimits.*(2048/pi), 'uint32');
 end
 

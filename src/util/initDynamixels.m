@@ -36,30 +36,32 @@ function status = initDynamixels(port_num, mode)
         % Put actuator into Control Mode
         write1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_OPERATING_MODE, MODE(i));
         
-        % Ensure that goal velocity is 0
-        write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_GOAL_VELOCITY, 0);
+        if mode=="vel"
+            % Set Dynamixel Velocity PI gains
+            write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_VEL_P_GAIN, DYN_VEL_P);
+%             write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_VEL_I_GAIN, DYN_VEL_I);
+            
+            % Set Dynamixel Velocity Limit
+            write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_VEL_LIMIT, velocityLimit);
+            
+            % Ensure that goal velocity is 0
+            write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_GOAL_VELOCITY, 0);
+        else
+            % Set max position limit
+            write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_MAX_POS, servoLimits(i,2));
+            % Set min position limit
+            write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_MIN_POS, servoLimits(i,1));
+            
+            % Set Dynamixel Position PI gains
+            write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_POS_P_GAIN, DYN_POS_P);
+            write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_POS_I_GAIN, DYN_POS_I);
+            write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_POS_D_GAIN, DYN_POS_D);
 
-        % Set max position limit
-        write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_MAX_POS, servoLimits(i,2));
-        % Set min position limit
-        write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_MIN_POS, servoLimits(i,1));
-        
-        % Set Dynamixel Velocity Limit
-        write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_VEL_LIMIT, velocityLimit);
-        
-        % Set Dynamixel Velocity PI gains
-        write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_VEL_P_GAIN, DYN_VEL_P);
-        write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_VEL_I_GAIN, DYN_VEL_I);
-        
-        % Set Dynamixel Position PI gains
-        write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_POS_P_GAIN, DYN_POS_P);
-        write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_POS_I_GAIN, DYN_POS_I);
-        write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_POS_D_GAIN, DYN_POS_D);
-
-        % Set profile velocity - smoother motion
-        write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PROFILE_VELOCITY, DYN_PRO_VEL);
-        % Profile acceleration
-        write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PROFILE_ACCEL, DYN_PRO_ACC);
+            % Set profile velocity - smoother motion
+            write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PROFILE_VELOCITY, DYN_PRO_VEL);
+            % Profile acceleration
+            write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PROFILE_ACCEL, DYN_PRO_ACC);
+        end
 
         % Set Dynamixel Torque
         write1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_TORQUE_ENABLE, 1);
@@ -83,31 +85,48 @@ function status = initDynamixels(port_num, mode)
         % Disable Dynamixel torque to write settings to it
 
         % Put actuator into Position Control Mode
-        ModeCheck = MODE(i)==read1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_OPERATING_MODE);
+        ModeCheck = read1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_OPERATING_MODE);
+        ModeCheck = ModeCheck==MODE(i);
         
-        % Set max position limit
-        PosUBCheck = servoLimits(i,2)==read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_MAX_POS, servoLimits(i,2));
-        % Set min position limit
-        PosLBCheck = servoLimits(i,1)==read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_MIN_POS, servoLimits(i,1));
-        
-        % Set Dynamixel Velocity Limit
-        VelLimCheck = velocityLimit==read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_VEL_LIMIT);
-        
-        % Set Dynamixel Velocity PI gains
-        velPCheck = DYN_VEL_P==read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_VEL_P_GAIN);
-        velICheck = DYN_VEL_I==read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_VEL_I_GAIN);
-        
-        % Set Dynamixel Position PI gains
-        posPCheck = DYN_POS_P==read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_POS_P_GAIN);
-        posICheck = DYN_POS_I==read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_POS_I_GAIN);
-        posDCheck = DYN_POS_D==read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_POS_D_GAIN);
+        if mode=="vel"
+            % Set Dynamixel Velocity Limit
+            VelLimCheck = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_VEL_LIMIT);
+            VelLimCheck = velocityLimit==VelLimCheck;
+            
+            % Set Dynamixel Velocity PI gains
+            velPCheck = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_VEL_P_GAIN);
+            velPCheck = DYN_VEL_P==velPCheck;
+            velICheck = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_VEL_I_GAIN);
+%             velICheck = DYN_VEL_I==velICheck;
+            velICheck = 1;
 
-        % Set profile velocity - smoother motion
-        proVelCheck = DYN_PRO_VEL==read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PROFILE_VELOCITY);
-        % Profile acceleration
-        proAccCheck = DYN_PRO_ACC==read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PROFILE_ACCEL);
+            CheckArr = [ModeCheck 1 1 VelLimCheck velPCheck velICheck 1 1 1 1 1];
+        else
+            % Set max position limit
+            PosUBCheck = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_MAX_POS);
+            PosUBCheck = servoLimits(i,2)==PosUBCheck;
+            % Set min position limit
+            PosLBCheck = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_MIN_POS);
+            PosLBCheck = servoLimits(i,1)==PosLBCheck;
 
-        CheckArr = [ModeCheck PosUBCheck PosLBCheck VelLimCheck velPCheck velICheck posPCheck posICheck posDCheck proVelCheck proAccCheck];
+            % Set Dynamixel Position PI gains
+            posPCheck = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_POS_P_GAIN);
+            posPCheck = DYN_POS_P==posPCheck;
+            
+            posICheck = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_POS_I_GAIN);
+            posICheck = DYN_POS_I==posICheck;
+            posDCheck = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_POS_D_GAIN);
+            posDCheck = DYN_POS_D==posDCheck;
+
+            % Set profile velocity - smoother motion
+            proVelCheck = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PROFILE_VELOCITY);
+            proVelCheck = DYN_PRO_VEL==proVelCheck;
+            % Profile acceleration
+            proAccCheck = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PROFILE_ACCEL);
+            proAccCheck = DYN_PRO_ACC==proAccCheck;
+
+            CheckArr = [ModeCheck PosUBCheck PosLBCheck 1 1 1 posPCheck posICheck posDCheck proVelCheck proAccCheck];
+        end
 
         if any(CheckArr==0)
             fprintf("Servo %d values not written correctly.\n", params.DXL_LIST(i));

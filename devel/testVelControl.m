@@ -52,18 +52,19 @@ else
 end
 
 % Check for error in initializing dynamixels
-if initDynamixels(port_num, 'vel') ~= 0
-    return
-end
+if initDynamixels(port_num, 'vel') == 0
+
 
 %% DO STUFF HERE
 
 servoLimits = getServoLimits();
 velocityLimit = getDXLSettings().velocityLimit;
 
+write1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(1), params.ADDR_PRO_TORQUE_ENABLE, 0);
+
 % Initialization
 % Set Servo 2-4 to be in position control mode (so that they hold still!)
-goal_pos_all = [2048 2048 2048 2048];  % TODO CHECK THIS POSITION
+goal_pos_all = [2048 2048 2048 3000];
 for i=2:4
     % Disable Dynamixel torque to write settings to it
     write1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_TORQUE_ENABLE, 0);
@@ -77,15 +78,16 @@ end
 
 goal_pos = goal_pos_all(1);    % For servo 1
 curr_pos = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(1), params.ADDR_PRO_PRESENT_POSITION);
-curr_vel = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(1), params.ADDR_PRO_PRESENT_VELOCITY);
+curr_vel = twos2decimal(read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(1), params.ADDR_PRO_PRESENT_VELOCITY), 32);
 curr_err = goal_pos - curr_pos;
 err_acc = 0;
 
 % Interpolate between waypoints
 vias = [curr_pos goal_pos_all(2:4); goal_pos_all(1:4)];
 Tend = 5;
-T = assignViaTimes(vias, Tend);
+T = assignViaTimes(vias, Tend, 'lin');
 coeffs = interpQuinticTraj(vias, T);
+figure
 plotQuinticInterp(vias, coeffs, T);
 
 err_vec(1) = curr_err;  % velocity histories
@@ -95,36 +97,34 @@ time_vec(1) = 0;
 
 start_time = now;
 curr_time = 0;
-while curr_err < 5 && curr_time < Tend  
+while abs(curr_err) > 5 && curr_time < Tend
     % TODO figure out what to do if control has not converged by the time ending
-    desiredVel = sampleQuinticVel(coeffs, T, curr_time);    % This is bugged
+    desiredVel = sampleQuinticVel(coeffs, T, curr_time);
     desiredVel = desiredVel(1);
 
-    % Clamp to velocity limits
-    if desiredVel > 0
-        desiredVel = min(desiredVel, velocityLimit);
-    else
-        desiredVel = max(desiredVel, -velocityLimit);
-    end
-    
     % Convert into RPM?
-
     [jointVel, err_acc] = feedforwardPIcontrol(desiredVel, curr_err, err_acc);
+    
+    % Clamp to velocity limits
+    if jointVel > 0
+        jointVel = min(jointVel, velocityLimit);
+    else
+        jointVel = max(jointVel, -velocityLimit);
+    end
     
     curr_pos = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(1), params.ADDR_PRO_PRESENT_POSITION);
     
-    if curr_pos > servoLimits(1,1) || curr_pos < servoLimits(1,1)
+    if curr_pos > servoLimits(1,2) || curr_pos < servoLimits(1,1)
         write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(1), params.ADDR_PRO_GOAL_VELOCITY, 0);
         disp("VIOLATED JOINT LIMITS! EXITING")
         break % STOP EXECUTION
     end
     
-    curr_vel = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(1), params.ADDR_PRO_PRESENT_VELOCITY);
+    curr_vel = twos2decimal(read4ByteTxRx (port_num, params.PROTOCOL_VERSION, params.DXL_LIST(1), params.ADDR_PRO_PRESENT_VELOCITY), 32 );
     
-    % Don't do this yet
-    % write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(1), params.ADDR_PRO_GOAL_VELOCITY, jointVel);
+    write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(1), params.ADDR_PRO_GOAL_VELOCITY, cast(jointVel, 'uint32') );
     
-    curr_time = (now-start) * 24 * 60 * 60;
+    curr_time = (now-start_time) * 24 * 60 * 60;
     curr_err = goal_pos - curr_pos;
     err_vec(end+1) = curr_err;
     vel_vec(end+1) = curr_vel;
@@ -133,24 +133,27 @@ while curr_err < 5 && curr_time < Tend
 end
 
 % Plot histories
+figure
 subplot(2,1,1)
-plot(err_vec, time_vec)
-title("E")
+plot(time_vec, err_vec)
+title("Error history")
 grid on
 
 subplot(2,1,2)
-plot(command_vel_vec, time_vec)
+plot(time_vec, command_vel_vec)
 hold on
-plot(vel_vec, time_vec)
+plot(time_vec, vel_vec)
 title("Commanded vs actual velocities")
 legend("Commanded velocity", "Actual velocity")
 grid on
 hold off
 
+end % End bug-free code
+
 %% -- Dynamixel Cleanup Start -- %%
 for i=1:length(params.DXL_LIST)
     % Disable Dynamixel Torque
-    write1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_TORQUE_ENABLE, 0);
+    % write1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_TORQUE_ENABLE, 0);
     dxl_comm_result = getLastTxRxResult(port_num, params.PROTOCOL_VERSION);
     dxl_error = getLastRxPacketError(port_num, params.PROTOCOL_VERSION);
     if dxl_comm_result ~= params.COMM_SUCCESS
@@ -166,6 +169,3 @@ fprintf('Port Closed \n');
 
 % Unload Library
 unloadlibrary(lib_name);
-
-% close all;
-clear

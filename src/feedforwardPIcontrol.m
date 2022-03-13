@@ -10,7 +10,7 @@ function [jointVel, errorIntegral] = feedforwardPIcontrol(desiredVel, error, pre
 % jointVel      : output velocity terms
 % errorIntegral : summing prevError and error
 
-    Kp = 1;
+    Kp = 0.1;
     Ki = 0;     % Kp and Ki are scalars with values to be tuned
 
     errorIntegral = prevError + error;
