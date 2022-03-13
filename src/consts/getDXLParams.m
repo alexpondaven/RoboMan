@@ -3,17 +3,24 @@ function params = getDXLParams(port_num)
     % ---- Control Table Addresses ---- %%
     params.ADDR_PRO_TORQUE_ENABLE       = 64;           % Control table address is different in Dynamixel model
     params.ADDR_PRO_GOAL_POSITION       = 116; 
+    params.ADDR_PRO_GOAL_VELOCITY       = 104;
+
     params.ADDR_PRO_PRESENT_POSITION    = 132; 
     params.ADDR_PRO_PRESENT_VELOCITY    = 128;
     params.ADDR_PRO_OPERATING_MODE      = 11;
     params.ADDR_PRO_DRIVE_MODE          = 10;
     
-    params.ADDR_PRO_GOAL_VELOCITY       = 104;
     params.ADDR_PRO_PROFILE_VELOCITY    = 112;
+    params.ADDR_PRO_PROFILE_ACCEL       = 108;
     params.ADDR_VEL_LIMIT = 44;
+    
     params.ADDR_VEL_P_GAIN = 78;
     params.ADDR_VEL_I_GAIN = 76;
-    
+
+    params.ADDR_POS_P_GAIN = 84;
+    params.ADDR_POS_I_GAIN = 82;
+    params.ADDR_POS_D_GAIN = 80;
+
     % ---- Other Settings ---- %%
     
     % Protocol version

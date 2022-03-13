@@ -12,7 +12,7 @@ function initDynamixels(port_num)
 
     for i=1:length(params.DXL_LIST)
         % Put actuator into Position Control Mode
-        write1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_OPERATING_MODE, 3);
+        write1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_OPERATING_MODE, 1);
         % Change this to velocity control mode (1)
         % Set max position limit
         write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_MAX_POS, servoLimits(i,2));
@@ -24,13 +24,20 @@ function initDynamixels(port_num)
         write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_VEL_P_GAIN, 65);
         write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_VEL_I_GAIN, 900);
         
+        % Set Dynamixel Position PI gains
+        write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_POS_P_GAIN, 400);
+        write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_POS_I_GAIN, 50);
+        write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_POS_D_GAIN, 0);
+
+        % Set profile velocity - smoother motion
+        write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PROFILE_VELOCITY, 2048);
+        % Profile acceleration
+        write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PROFILE_ACCEL, 4000);
+
         % Set Dynamixel Torque
         write1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_TORQUE_ENABLE, 1);
 
 
-        % Set profile velocity - smoother motion
-        % write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_LIST(i), ADDR_PRO_PROFILE_VELOCITY, 1024);
-        % Profile acceleration
 
         dxl_comm_result = getLastTxRxResult(port_num, params.PROTOCOL_VERSION);
         dxl_error = getLastRxPacketError(port_num, params.PROTOCOL_VERSION);
