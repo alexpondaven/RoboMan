@@ -2,9 +2,8 @@ function dxlSettings = getDXLSettings()
 
     %% Dynamixel parameters
     dxlSettings.servoLimits = getServoLimits();    
-    dxlSettings.velocityLimit = 20;     % 4.58rpm
-    % Velocity PI Gains
-    dxlSettings.DYN_VEL_P = 65;
+    dxlSettings.velocityLimit = 40;
+    dxlSettings.DYN_VEL_P = 100;
     dxlSettings.DYN_VEL_I = 900;
 
     % Position PID Gains
