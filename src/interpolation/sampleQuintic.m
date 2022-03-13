@@ -16,5 +16,5 @@ dT = curTime - T(seg);
 % Sample quintic
 row = 6*(seg-1)+1;
 theta = coeffs(row,:) + coeffs(row+1,:)*dT + coeffs(row+2,:)*dT^2 + coeffs(row+3,:)*dT^3 ...
-        + coeffs(row+3,:)*dT^4 + coeffs(row+4,:)*dT^5;
+        + coeffs(row+4,:)*dT^4 + coeffs(row+5,:)*dT^5;
 end

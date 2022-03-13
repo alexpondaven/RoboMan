@@ -16,5 +16,5 @@ function theta = sampleQuinticVel(coeffs, T, curTime)
     % Sample cubic
     row = 6*(seg-1)+1;
     theta = coeffs(row+1,:) + 2*coeffs(row+2,:)*dT + 3*coeffs(row+3,:)*dT^2 ...
-            + 4*coeffs(row+3,:)*dT^3 + 5*coeffs(row+4,:)*dT^4;
+            + 4*coeffs(row+4,:)*dT^3 + 5*coeffs(row+5,:)*dT^4;
     end
