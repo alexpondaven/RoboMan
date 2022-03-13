@@ -1,4 +1,4 @@
-function [coeffs,T] = interpCubicTraj(vias, Tend)
+function coeffs = interpCubicTraj(vias, T)
 % INTERPTRAJ    Cubic time-based interpolation between given via points
 %
 % A cubic is fit between every pair of via points with constraints:
@@ -7,7 +7,7 @@ function [coeffs,T] = interpCubicTraj(vias, Tend)
 % 
 % ARGS
 % vias      : Via points (4 theta values each) that trajectory must pass through
-% Tend      : Time to reach final via point
+% T         : Times for each via point
 % 
 % RETURNS
 % coeffs    : Each joint's coefficients in cubic
@@ -15,7 +15,7 @@ function [coeffs,T] = interpCubicTraj(vias, Tend)
 
 % For now set via point times linearly
 k = size(vias,1)-1; % Number of segments
-T = Tend * cumsum([0,ones(1,k)])/k;
+% T = Tend * cumsum([0,ones(1,k)])/k;
 dT = diff(T); % Even spacing of times at each via point
 
 

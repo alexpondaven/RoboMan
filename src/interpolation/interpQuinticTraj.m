@@ -1,13 +1,14 @@
-function [coeffs,T] = interpQuinticTraj(vias, Tend)
+function coeffs = interpQuinticTraj(vias, T)
 % INTERPTRAJ    Quintic time-based interpolation between given via points
 %
 % A quintic is fit between every pair of via points with constraints:
-% - Time at each joint
-% - Velocity equal before and after each joint
+% - Position, velocity, acceleration equal before and after each joint and
+%   zero at beginning/end
+% -
 % 
 % ARGS
 % vias      : Via points (4 theta values each) that trajectory must pass through
-% Tend      : Time to reach final via point
+% T         : Times for each via point
 % 
 % RETURNS
 % coeffs    : Each joint's coefficients in cubic
@@ -15,7 +16,7 @@ function [coeffs,T] = interpQuinticTraj(vias, Tend)
 
 % For now set via point times linearly
 k = size(vias,1)-1; % Number of segments
-T = Tend * cumsum([0,ones(1,k)])/k;
+% T = Tend * cumsum([0,ones(1,k)])/k;
 dT = diff(T); % Even spacing of times at each via point
 
 % Size of linear problem

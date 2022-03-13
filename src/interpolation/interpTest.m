@@ -31,7 +31,7 @@ vias = [0 0 0 0
 
 % vias = [[0:10]' [0:10]' [0:10]' [0:10]'];
 
-Tend = 2;
+Tend = 5;
 
 %% Cubic Interpolation
 % [coeffs, T] = interpCubicTraj(vias,Tend)
@@ -39,6 +39,7 @@ Tend = 2;
 % plotCubicInterp(vias, coeffs, T)
 
 %% Quintic Interpolation
-[coeffs, T] = interpQuinticTraj(vias,Tend)
+T = assignViaTimes(vias,Tend)
+coeffs = interpQuinticTraj(vias, T)
 
 plotQuinticInterp(vias, coeffs, T)
