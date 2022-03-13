@@ -2,23 +2,24 @@ function status = initDynamixels(port_num, mode)
     % Initialize all dynamixels
     
     params = getDXLParams();
-    
+    dxlSettings = getDXLSettings();
+
     %% Dynamixel parameters
-    servoLimits = getServoLimits();    
-    velocityLimit = 200;     % 5.73rpm
+    servoLimits = dxlSettings.servoLimits;    
+    velocityLimit = dxlSettings.velocityLimit;     % 5.73rpm
 
     % Velocity PI Gains
-    DYN_VEL_P = 65;
-    DYN_VEL_I = 900;
+    DYN_VEL_P = dxlSettings.DYN_VEL_P;
+    DYN_VEL_I = dxlSettings.DYN_VEL_I;
 
     % Position PID Gains
-    DYN_POS_P = 400;
-    DYN_POS_I = 50;
-    DYN_POS_D = 0;
+    DYN_POS_P = dxlSettings.DYN_POS_P;
+    DYN_POS_I = dxlSettings.DYN_POS_I;
+    DYN_POS_D = dxlSettings.DYN_POS_D;
 
     % Profile velocity and acceleration values
-    DYN_PRO_VEL = 2048;
-    DYN_PRO_ACC = 4000;
+    DYN_PRO_VEL = dxlSettings.DYN_PRO_VEL;
+    DYN_PRO_ACC = dxlSettings.DYN_PRO_ACC;
 
     if mode=="vel"
         MODE(1:4) = [1 1 1 1];
