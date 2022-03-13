@@ -82,7 +82,7 @@ if initDynamixels(port_num, 'vel') == 0
 
     % Interpolate between waypoints
     vias = [curr_pos goal_pos_all(2:4); goal_pos_all(1:4); curr_pos goal_pos_all(2:4)];
-    Tend = 10;
+    Tend = 5;
     T = assignViaTimes(vias, Tend, 'lin');
     coeffs = interpQuinticTraj(vias, T);
     figure
@@ -90,6 +90,7 @@ if initDynamixels(port_num, 'vel') == 0
 
     err_vec(1) = curr_err;  % velocity histories
     vel_vec(1) = curr_vel;
+    pos_vec(1) = curr_pos;
     command_vel_vec(1) = 0;
     time_vec(1) = 0;
 
@@ -133,9 +134,13 @@ if initDynamixels(port_num, 'vel') == 0
         err_vec(end+1) = curr_err;
         vel_vec(end+1) = curr_vel;
         command_vel_vec(end+1) = jointVel;
+        pos_vec(end+1) = curr_pos;
         time_vec(end+1) = curr_time;
-
     end
+
+    % Use PI controller to make sure that controller actually gets where it's supposed to go?
+    % TODO : If velocity limit is clipped, then we won't actually hit the target vias.
+    % TODO : Add in some feedback control at the end to solve it
 
     % Ensure that final speed is always 0
     write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(1), params.ADDR_PRO_GOAL_VELOCITY, 0);
@@ -144,12 +149,21 @@ if initDynamixels(port_num, 'vel') == 0
 
     % Plot histories
     figure
-    subplot(2,1,1)
+    subplot(3,1,1)
     plot(time_vec, err_vec)
     title("Error history")
     grid on
 
-    subplot(2,1,2)
+    subplot(3,1,2)
+    plot(time_vec, pos_vec)
+    hold on
+    title("Position history")
+    for i=1:size(vias,1)
+        plot(T(i),vias(i,1),'ro')
+    end
+    grid on
+
+    subplot(3,1,3)
     plot(time_vec, command_vel_vec)
     hold on
     plot(time_vec, vel_vec)
