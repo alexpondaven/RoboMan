@@ -125,39 +125,54 @@ if initDynamixels(port_num, 'vel') == 0
 
     start_time = now;
     curr_time = 0;
+    
+    % Store previous target segment
+    prevTargetIdx = 1;
+    
+    last_seg = false;   % If we are homing on the last segment
+
     % while abs(curr_err) > 5 && curr_time < Tend
-    while curr_time < Tend
+    while ~( last_seg && all( abs(curr_err) < 5 ) )
         % TODO figure out what to do if control has not converged by the time ending
-        [desiredVel, targetIdx] = sampleQuinticVel(coeffs, T, curr_time);
-        % Convert into RPM?
+        if curr_time < Tend
+            [desiredVel, targetIdx] = sampleQuinticVel(coeffs, T, curr_time);
+        else
+            desiredVel = zeros(1,4);
+            targetIdx = size(vias,1);
+        end
+
+        last_seg = targetIdx == size(vias, 1)
+        curr_err
+        
+        % Check if new segment
+        if targetIdx ~= prevTargetIdx
+            disp("Reset error accumulator!")
+            err_acc = 0;
+        end
+        prevTargetIdx = targetIdx;
         [jointVel, err_acc] = feedforwardPIcontrol(desiredVel, curr_err, err_acc);
 
-        % Convert sampled joint velocity from ticks/s to rev/min
-        % one unit = 0.229 RPM
+        % Convert sampled joint velocity from ticks/s to rev/min. One unit = 0.229 RPM
         jointVel = round( (jointVel * 60 / 4096) / 0.229 );
-
-        % if any(abs(pos_vec(end,:) - vias(end,:))>5)==1
-        %     jointVel = pos_vec(end,:) - vias(end,:);
-        % end
         
+        jointLimFlag = true;
         for i=1:4
 
-            % Clamp to velocity limits
-            % if jointVel(i) > 0
-            %     jointVel(i) = min(jointVel(i), velocityLimit);
-            % else
-            %     jointVel(i) = max(jointVel(i), -velocityLimit);
-            % end
-
+            % Motor will clamp to velocity limits automatically
             curr_pos(i) = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_POSITION);
             
             if curr_pos(i) > servoLimits(i,2) || curr_pos(i) < servoLimits(i,1)
                 fprintf("VIOLATED JOINT LIMITS ON SERVO %d! EXITING\n", i);
+                jointLimFlag = false;
                 break % STOP EXECUTION
             end
             
             curr_vel(i) = twos2decimal(read4ByteTxRx (port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_VELOCITY), 32 );
             write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_GOAL_VELOCITY, typecast(int32(jointVel(i)), 'uint32') );
+        end
+
+        if ~jointLimFlag 
+            break 
         end
 
         curr_time = (now-start_time) * 24 * 60 * 60;
@@ -212,7 +227,7 @@ if initDynamixels(port_num, 'vel') == 0
         hold off
     end
 
-end % End bug-free code
+end % End checking that dynamixels have set up correctly
 
 %% -- Dynamixel Cleanup Start -- %%
 for i=1:length(params.DXL_LIST)
