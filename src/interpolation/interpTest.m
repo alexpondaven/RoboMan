@@ -65,7 +65,7 @@ vias % For debugging
 % plotCubicInterp(vias, coeffs, T)
 
 %% Quintic Interpolation
-T = assignViaTimes(vias,Tend)
+T = assignViaTimes(vias,Tend,'acc');
 coeffs = interpQuinticTraj(vias, T)
 
 plotQuinticInterp(vias, coeffs, T)
