@@ -108,10 +108,9 @@ if initDynamixels(port_num, 'vel') == 0
         theta = inverseKinDynamixel(corners(j, 1), corners(j, 2), corners(j, 3), -pi/2, GRIP_POS);
         vias = [vias; theta(1:4)];
     end
-    Tend = 10;
 
     % Interpolate between waypoints
-    T = assignViaTimes(vias, Tend, 'dvel');
+    [T, Tend] = assignViaTimes(vias, 'dvel');    % Tend no longer used
     coeffs = interpQuinticTraj(vias, T);
     figure
     plotQuinticInterp(vias, coeffs, T);
@@ -144,9 +143,8 @@ if initDynamixels(port_num, 'vel') == 0
             targetIdx = size(vias,1);
         end
 
-        last_seg = targetIdx == size(vias, 1)
-        curr_err
-        
+        last_seg = targetIdx == size(vias, 1);
+
         % Check if new segment
         if targetIdx ~= prevTargetIdx
             disp("Reset error accumulator!")
@@ -180,7 +178,7 @@ if initDynamixels(port_num, 'vel') == 0
 
         curr_time = (now-start_time) * 24 * 60 * 60;
 %         curr_err = vias(targetIdx, :) - curr_pos;   % current goal position is that for targetIdx
-        curr_err = desiredPos - curr_pos;
+        curr_err = desiredPos - curr_pos; % Difference between sampled quintic position and measured position
         err_vec(end+1,:) = curr_err;
         vel_vec(end+1,:) = curr_vel;
         command_vel_vec(end+1,:) = jointVel;
