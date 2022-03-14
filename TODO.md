@@ -14,3 +14,30 @@
 - Convert shapes to draw into waypoints or endpoints
 
 # 3) Self-made task
+
+
+
+# Refactor via points
+
+Program Flow
+-> Bootup initial position
+-> Goal waypoints
+
+Calculate A* waypoints from initial position->waypoint_1->...->waypoint_N
+-> Create list of via points
+
+for vias in via_point_list:
+
+positions = [[],[],[]]
+
+heavy-lifting calculation
+  for each adjacent position:
+  - get via point set by A* search
+  - Interpolate between via points -> coeffs
+
+for each adjacent position:
+- write to servos
+
+
+# General
+[ ] Easy entry point to calibrate each servo with position based offsets (for actual day)
