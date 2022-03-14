@@ -9,6 +9,8 @@
   - Trajectory interpolation given a suitable TEnd and the path above
   - Looping over each cube
 
+- Come up with manual instruction sequence to the A* waypoints and the occupancy grid at that point in time
+
 # 2) Drawing
 - Test performance of velocity-based control with pen
 - Convert shapes to draw into waypoints or endpoints
