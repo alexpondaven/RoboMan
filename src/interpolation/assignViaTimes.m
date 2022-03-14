@@ -1,13 +1,23 @@
-function T = assignViaTimes(vias, Tend, strat)
+function [T,Tend] = assignViaTimes(vias, strat)
 % assignViaTimes Assign times to each via point according to strategy
 %
 % Args
 % vias  : Waypoints / via points of each theta (4 values in each row)
-% Tend  : Time to reach last via point
 % strat : Strategy includes ['lin','dpos','acc','dvel']
 %
 % Return
 % T     : Time of each via point (should be same #rows as vias)
+% Tend  : Time to reach last via point
+
+
+% Determine Tend proportional to the max total distance travelled
+maxTotalDist = max(sum(abs(diff(vias))));
+VEL_SCALING = 0.3;      % TODO Tune this
+maxVel = (getDXLSettings().velocityLimit/60*0.229*4096) * VEL_SCALING;
+% Convert (scaled) RPM to Ticks/second and apply scaling
+Tend = maxTotalDist / maxVel;
+
+Tend = 15;  % fr now
 
 k = size(vias,1)-1;
 
