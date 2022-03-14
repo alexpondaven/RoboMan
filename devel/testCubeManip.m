@@ -67,11 +67,22 @@ if initDynamixels(port_num, 'vel') == 0
 
     occupancyGrid= createOccupancyGrid(cube_locs, cube_hold);
 
+    % Phase 1: Move from current position to startPos
+    % TODO
+
+    % Phase 2: Grip cube (move from startPos (open) -> cubePos (open) -> cubePos(closed) -> startPos(closed))
+    % TODO
+    
+    % Phase 3: Move from startPos (closed) to endPos (endPos)
     % Try to rotate cube at (9,0)
     startPos = [225, 0, 45, 0];
     endPos = [225, 0, 45, -pi/2];
 
     vias = AstarSearch(startPos, endPos, occupancyGrid);
+    for i=1:size(vias, 1)
+        % TODO clean this up (argument?)
+        vias(i,:) = inverseKinDynamixel2(vias(i,:));
+    end
     Tend = 10;
 
     % Initialization
@@ -165,9 +176,7 @@ if initDynamixels(port_num, 'vel') == 0
             write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_GOAL_VELOCITY, typecast(int32(jointVel(i)), 'uint32') );
         end
 
-        if ~jointLimFlag 
-            break 
-        end
+        if ~jointLimFlag break end
 
         curr_time = (now-start_time) * 24 * 60 * 60;
         curr_err = vias(targetIdx, :) - curr_pos;   % current goal position is that for targetIdx
@@ -220,6 +229,9 @@ if initDynamixels(port_num, 'vel') == 0
         % sgtitle("Joint " + joint)
         hold off
     end
+
+    % Phase 4: Move from endPos(closed) -> cubePos (closed) -> cubePos(open) -> endPos(open)
+    % TODO
 
 end % End checking that dynamixels have set up correctly
 
