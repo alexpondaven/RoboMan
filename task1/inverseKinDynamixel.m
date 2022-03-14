@@ -1,10 +1,6 @@
 function theta = inverseKinDynamixel(x,y,z,theta_G, gripSize)
     % Wrapper around inverseKin to convert angles to Dynamixel ticks
 
-    % SOME_PARAMS_HERE
-    D11_OFFSET = pi; % hip
-    D12_OFFSET = pi; % shoulder
-    D13_OFFSET = pi; % elbow
     % Hip
     D11_PARAMS = struct('LB',deg2rad(90), ...
                  'UB', deg2rad(270), ...

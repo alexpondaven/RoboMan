@@ -8,7 +8,7 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
 % occupancyGrid : 3D array of (theta_1, x', y') configurations
 % 
 % Returns:
-% waypoints : 2D array of (x, y, z, theta_g) angles.
+% waypoints : 2D array of (x, y, z, theta_g) angles in radians.
 
     ogParams = getOccupancyGridParams();
     N_X_LIST = size(ogParams.X_LIST, 2);
