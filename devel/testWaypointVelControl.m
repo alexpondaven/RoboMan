@@ -136,7 +136,10 @@ if initDynamixels(port_num, 'vel') == 0
         % TODO figure out what to do if control has not converged by the time ending
         if curr_time < Tend
             [desiredVel, targetIdx] = sampleQuinticVel(coeffs, T, curr_time);
+            desiredPos = sampleQuintic(coeffs, T, curr_time);
         else
+            % Aim to be at final position with zero velocity
+            desiredPos = vias(end,:);
             desiredVel = zeros(1,4);
             targetIdx = size(vias,1);
         end
@@ -176,7 +179,8 @@ if initDynamixels(port_num, 'vel') == 0
         end
 
         curr_time = (now-start_time) * 24 * 60 * 60;
-        curr_err = vias(targetIdx, :) - curr_pos;   % current goal position is that for targetIdx
+%         curr_err = vias(targetIdx, :) - curr_pos;   % current goal position is that for targetIdx
+        curr_err = desiredPos - curr_pos;
         err_vec(end+1,:) = curr_err;
         vel_vec(end+1,:) = curr_vel;
         command_vel_vec(end+1,:) = jointVel;
