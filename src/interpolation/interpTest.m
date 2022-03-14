@@ -29,34 +29,35 @@ vias = [0 0 0 0
         1 4 9 1
         2 5 2 2
         8 2 4 6];
+Tend =15;
 
 %% Testing for square case
-z=90;
-% Corners
-square = [ 175 -50 z
-           175  50 z
-           75   50 z
-           75  -50 z ];
-
-square(5,:) = square(1,:);  % make it complete the square
-
-% interpolate lines between corners
-corners = [];
-numPoints = 10;
-for i=2:length(square)
-    corners = [corners; linearInterpolate(square(i-1,:), square(i,:), numPoints) ];
-end
-
-vias = [];
-for j=1:size(corners, 1)
-    % corners(j,:)
-    theta = inverseKinDynamixel(corners(j, 1), corners(j, 2), corners(j, 3), -pi/2, GRIP_POS);
-    GRIP_ANGLE = theta(5);
-    vias = [vias; theta(1:4)];
-end
-Tend = 15;
-
-vias % For debugging
+% z=90;
+% % Corners
+% square = [ 175 -50 z
+%            175  50 z
+%            75   50 z
+%            75  -50 z ];
+% 
+% square(5,:) = square(1,:);  % make it complete the square
+% 
+% % interpolate lines between corners
+% corners = [];
+% numPoints = 10;
+% for i=2:length(square)
+%     corners = [corners; linearInterpolate(square(i-1,:), square(i,:), numPoints) ];
+% end
+% 
+% vias = [];
+% for j=1:size(corners, 1)
+%     % corners(j,:)
+%     theta = inverseKinDynamixel(corners(j, 1), corners(j, 2), corners(j, 3), -pi/2, GRIP_POS);
+%     GRIP_ANGLE = theta(5);
+%     vias = [vias; theta(1:4)];
+% end
+% Tend = 15;
+% 
+% vias % For debugging
 
 % vias = [[0:10]' [0:10]' [0:10]' [0:10]'];
 %% Cubic Interpolation
