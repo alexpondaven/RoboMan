@@ -1,4 +1,4 @@
-function coeff_paths = interpViaPoints(via_paths, isPlot)
+function [coeff_paths, T, Tend] = interpViaPoints(via_paths, isPlot)
 % interpViaPoints  Interpolate using quintic between via points and return coeffs
 %
 % Args
@@ -7,6 +7,9 @@ function coeff_paths = interpViaPoints(via_paths, isPlot)
 %
 % Return
 % coeff_paths   : Cell array of coefficients for each path
+% T     : Time of each via point (should be same #rows as vias)
+% Tend  : Time to reach last via point
+
     coeff_paths = {};
     for i=1:size(via_paths,1)
         % Start with current position? - but we don't know current position after every segment
@@ -14,7 +17,7 @@ function coeff_paths = interpViaPoints(via_paths, isPlot)
         % vias(1,:) = curr_pos;
 
         % Interpolate between waypoints
-        vias = via_paths(i)
+        vias = via_paths{i};
         [T, Tend] = assignViaTimes(vias, 'dvel');    % Tend no longer used
         coeffs = interpQuinticTraj(vias, T);
 

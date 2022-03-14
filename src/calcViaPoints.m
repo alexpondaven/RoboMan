@@ -11,7 +11,7 @@ function via_paths = calcViaPoints(AStarWaypoints, occupancyGridVect)
 
 via_paths = {};
 for waypoint_idx=1:(size(AStarWaypoints,1)-1)
-    waypoints = AstarSearch(AStarWaypoints(waypoint_idx), AStarWaypoints(waypoint_idx+1), occupancyGridVect(waypoint_idx) );
+    waypoints = AstarSearch(AStarWaypoints(waypoint_idx,:), AStarWaypoints(waypoint_idx+1,:), squeeze(occupancyGridVect(waypoint_idx,:,:,:)) );
     vias = zeros( size(waypoints, 1)+1, 4 );
     for i=1:size(waypoints, 1)
         ikResult = inverseKin2( waypoints(i,1), waypoints(i,2), waypoints(i,3), waypoints(i,4), true );
