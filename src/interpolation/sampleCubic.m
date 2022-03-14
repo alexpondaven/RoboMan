@@ -10,7 +10,10 @@ function theta = sampleCubic(coeffs, T, curTime)
 % theta     : Theta values sampled at curTime
 
 % Detect which segment it is in
-seg = find(T>curTime,1)-1;
+seg = find(T>=curTime,1)-1;
+if seg==0
+    seg=1;
+end
 dT = curTime - T(seg);
 
 % Sample cubic

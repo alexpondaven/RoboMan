@@ -11,7 +11,10 @@ function [theta, target] = sampleQuinticVel(coeffs, T, curTime)
     % target    : Next via point
     
     % Detect which segment it is in
-    seg = find(T>curTime,1)-1;
+    seg = find(T>=curTime,1)-1;
+    if seg==0
+        seg=1;
+    end
     target = seg + 1;
     dT = curTime - T(seg);
     
