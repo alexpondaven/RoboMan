@@ -1,9 +1,10 @@
-function retCode = setGripperPos(port_num, open)
+function retCode = setGripperPos(open, port_num)
 % Sets gripper pose to desired position (open/closed)
 % Blocks until the desired motion has been completed.
 %
 % Args:
-% open : (bool) Gripper position, true=open, closed=false
+% open     : (bool) Gripper position, true=open, closed=false
+% port_num : value generated from main script
 %
 % Returns:
 % 0 on successful function exit

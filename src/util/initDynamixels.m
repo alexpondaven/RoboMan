@@ -154,4 +154,8 @@ function status = initDynamixels(port_num, mode)
         status = -1;
     end
 
+    if status == 0
+        setGripperPos(true, port_num);    % always start with gripper open
+    end
+
 end
