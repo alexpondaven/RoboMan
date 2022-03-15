@@ -86,7 +86,7 @@ if initDynamixels(port_num, 'vel') == 0
     AStarWaypoints = [currEndpointCoords, startPos, endPos];
     via_paths = calcViaPoints(AStarWaypoints, occupancyGridVect);   % TODO define occupancyGridVect
 
-    coeff_paths = interpViaPoints(via_paths, true);
+    [coeff_paths, T, Tend] = interpViaPoints(via_paths, true);
 
     startPos = [100, 0, 50, -pi/2];
     endPos = [225, 0, 50, 0];
