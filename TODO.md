@@ -3,7 +3,7 @@
 - [ ] {Alex} Skeleton code for the entirety of Task 2.1/2, able to specify the orientations and locations of the cubes
   - [ ] Function that takes in initial and desired cube states:
     - `initial_cube_state`:
-      - `initial_cube_state = [ [3,-8, 0, 0]; [9, 0, 0, 0]; [6, 6, 0, 0] ].';`
+      - `initial_cube_state = [ [3,-8, 1, 0]; [9, 0, 1, 0]; [6, 6, 1, 0] ].';`
       - (cube grid i, cube grid j, cube stack height, cube orientation)
       - Cube orientation (multiply by 90 degrees to get sensible rotation):
         - `0`: upwards
@@ -17,9 +17,10 @@
     - [ ] Desired intermediate waypoints that result in all cubes facing up
     - [ ] Valid occupancy grids for planning from one waypoint to the next
     - [ ] A set of collision-free via points for the end effector from one waypoint to the next
+- [ ] Create a way for us to manually declare path of cubes just in case, so it can be changed on demo day
 - [x] {TY} Refactor `inverseKin2` / `inverseKinDynamixel2` to be more elegant - `inverseKinDynamixel2` should be a wrapper around `inverseKin2`
-- [ ] {TY} Software API for interfacing with Servo 5 (function to open and close gripper)
-- [ ] {TY} Write cube grabbing/depositing function - pseudocode:
+- [x] {TY} Software API for interfacing with Servo 5 (function to open and close gripper)
+- [x] {TY} Write cube grabbing/depositing function - pseudocode:
   - We can call `mainServoLoop` within a wrapper function with the relevant arguments.
   - Procedure:
     1. Grabbing Cube
@@ -37,6 +38,7 @@
 - [ ] {TY} Expand A* Search space of theta_g to +- pi/2 (with sensible intervals)
 - [ ] {Alex} Tune variable `Tend` generation in `interpViaPoints`
 - [ ] Test function with arbitrary cube locations, orientations.
+
 
 ## Task 2.3 Cube Stacking
 - [ ] Skeleton code for the entirety of Task 2.3, able to specify the orientations and locations of the cubes
@@ -108,7 +110,7 @@ for each adjacent position:
 - [ ] Benchmark code
 - Task 2
   - [ ] Tune occupancy grid generation to match the real-world dimensions of each cubes and cube holders
-  - [ ] Test cube picking and dropping with 1 cube
+  - [x] Test cube picking and dropping with 1 cube
   - [ ] Test and tune cube translation for 1 cube in 3 locations
   - [ ] Test cube rotation for 1 cube in 3 locations
 - Task 3
