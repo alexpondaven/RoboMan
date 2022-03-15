@@ -17,7 +17,7 @@
     - [ ] Desired intermediate waypoints that result in all cubes facing up
     - [ ] Valid occupancy grids for planning from one waypoint to the next
     - [ ] A set of collision-free via points for the end effector from one waypoint to the next
-- [ ] {TY} Refactor `inverseKin2` / `inverseKinDynamixel2` to be more elegant - `inverseKinDynamixel2` should be a wrapper around `inverseKin2`
+- [x] {TY} Refactor `inverseKin2` / `inverseKinDynamixel2` to be more elegant - `inverseKinDynamixel2` should be a wrapper around `inverseKin2`
 - [ ] {TY} Software API for interfacing with Servo 5 (function to open and close gripper)
 - [ ] {TY} Write cube grabbing/depositing function - pseudocode:
   - We can call `mainServoLoop` within a wrapper function with the relevant arguments.

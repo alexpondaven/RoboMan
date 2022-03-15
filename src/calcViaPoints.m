@@ -14,9 +14,8 @@ for waypoint_idx=1:(size(AStarWaypoints,1)-1)
     waypoints = AstarSearch(AStarWaypoints(waypoint_idx,:), AStarWaypoints(waypoint_idx+1,:), squeeze(occupancyGridVect(waypoint_idx,:,:,:)) );
     vias = zeros( size(waypoints, 1)+1, 4 );
     for i=1:size(waypoints, 1)
-        ikResult = inverseKin2( waypoints(i,1), waypoints(i,2), waypoints(i,3), waypoints(i,4), true );
-        ikResult2 = inverseKinDynamixel2(ikResult);
-        vias(i+1, :) = ikResult2(1:4);
+        ikResult = inverseKinDynamixel2( waypoints(i,1), waypoints(i,2), waypoints(i,3), waypoints(i,4), true );
+        vias(i+1, :) = ikResult(1:4);
     end
 
     via_paths(end+1) = {vias};
