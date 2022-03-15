@@ -1,4 +1,4 @@
-%% Code to test drwaing fir task 3
+%% Code to test velocity control
 
 %% Initialization
 clc;
@@ -31,7 +31,6 @@ packetHandler();
 dxl_comm_result = params.COMM_TX_FAIL;           % Communication result
 dxl_error = 0;                              % Dynamixel error
 
-
 % Open port
 if (openPort(port_num))
     fprintf('Port Open\n');
@@ -54,66 +53,57 @@ end
 
 % Check for error in initializing dynamixels
 if initDynamixels(port_num, 'vel') == 0
-
-    %Task 3 Drawing
-    %get the current position 
-    % might not need in traangle drawing
-    % curr_pos = zeros(1,4);
-    % for i=1:4
-    %     curr_pos(i) = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_POSITION);
-    % end
-    % % To be tested, the start position for the pen
-    % startPos = [60, 200, 50, -pi/2];
-    % currEndpointCoords = getCurrEndpointCoords(curr_pos);
-    % via_paths = calcViaPoints(AStarWaypoints, occupancyGridVect);   % TODO define occupancyGridVect
-    % coeff_paths = interpViaPoints(via_paths, true);
-
+    %% DO STUFF HERE
 
     servoLimits = getServoLimits();
     velocityLimit = getDXLSettings().velocityLimit;
 
-    % Corners
-    z=90;
-    coords = [ 200 60  z
-               200 140 z
-               125 140 z
-               200 60  z ];
+    % Initialize occupancy grid
+    cube_locs = [ [3,-8, 0]; [9, 0, 0]; [6, 6, 0] ].';
+    % We take the transpose to be able to index properly
+    % Grid i,j coordinates, as well as current height
+    % (in stacking terms) of the cube
+    cube_hold = [ [3,-8]; [5,-5]; [4, 0]; [9, 0]; [0, 4]; [6, 6] ].';
 
-     % interpolate lines between corners
-     corners = [];
-     numPoints = 10;
-     for i=2:length(coords)
-        corners = [corners; linearInterpolate(coords(i-1,:), coords(i,:), numPoints) ];
-     end
+    occupancyGrid = createOccupancyGrid(cube_locs, cube_hold);
 
-     GRIP_POS = deg2rad(232);
+    % Phase 1: Move from current position to startPos
+    % TODO
 
-     curr_pos = zeros(1,4);
-     for i=1:4
-         curr_pos(i) = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_POSITION);
-     end
-     
-     currEndpointCoords = getCurrEndpointCoords(curr_pos);
-     %  calculate vias with adajustment to the gripper angle_thetaG  
-     vias = curr_pos;
-     for j=1:size(corners, 1)
-         % corners(j,:)
-         theta = inverseKinDynamixel3(corners(j, 1), corners(j, 2), corners(j, 3), -pi/2,pi/30,GRIP_POS);
-         vias = [vias; theta(1:4)];
-     end
+    % Phase 2: Grip cube (move from startPos (open) -> cubePos (open) -> cubePos(closed) -> startPos(closed))
+    % TODO
+    
+    % Phase 3: Move from startPos (closed) to endPos (closed)
+    % Try to rotate cube at (9,0)
+    
+    curr_pos = zeros(1,4);
+    for i=1:4
+        curr_pos(i) = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_POSITION);
+    end
+    
+    currEndpointCoords = getCurrEndpointCoords(curr_pos);
 
-      % Interpolate between waypoints
-    [T, Tend] = assignViaTimes(vias, 'dvel');    % Tend no longer used
-    coeffs = interpQuinticTraj(vias, T);
-    figure
-    plotQuinticInterp(vias, coeffs, T);
+    AStarWaypoints = [currEndpointCoords, startPos, endPos];
+    via_paths = calcViaPoints(AStarWaypoints, occupancyGridVect);   % TODO define occupancyGridVect
 
-    mainServoLoop(coeffs, T, Tend, port_num, true, vias);
+    [coeff_paths, T, Tend] = interpViaPoints(via_paths, true);
 
-end % End checking that dynamixels have set up correctly
+    startPos = [100, 0, 50, -pi/2];
+    endPos = [225, 0, 50, 0];
 
-    %% -- Dynamixel Cleanup Start -- %%
-  for i=1:length(params.DXL_LIST)
+    GRIP_POS = deg2rad(232);
+
+    % set isPlot to false for production
+    if mainServoLoop(coeffs, T, Tend, port_num, true) ~= 0
+        % ? Refactor such that it will GOTO END
+    end
+
+    % Phase 4: Deposit cube (move from endPos (closed) -> cubePos (closed) -> cubePos(open) -> endPos(open))
+
+end
+
+%% -- Dynamixel Cleanup Start -- %%
+for i=1:length(params.DXL_LIST)
     % Disable Dynamixel Torque
     % write1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_TORQUE_ENABLE, 0);
     dxl_comm_result = getLastTxRxResult(port_num, params.PROTOCOL_VERSION);
