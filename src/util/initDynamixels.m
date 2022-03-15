@@ -109,7 +109,7 @@ function status = initDynamixels(port_num, mode)
             velPCheck = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_VEL_P_GAIN);
             velPCheck = DYN_VEL_P==velPCheck;
 
-            CheckArr = [ModeCheck 1 1 VelLimCheck velPCheck velICheck 1 1 1 1 1];
+            CheckArr = [ModeCheck 1 1 VelLimCheck velPCheck 1 1 1 1 1];
         else
             % Set max position limit
             PosUBCheck = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_MAX_POS);
@@ -134,7 +134,7 @@ function status = initDynamixels(port_num, mode)
             proAccCheck = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PROFILE_ACCEL);
             proAccCheck = DYN_PRO_ACC==proAccCheck;
 
-            CheckArr = [ModeCheck PosUBCheck PosLBCheck 1 1 1 posPCheck posICheck posDCheck proVelCheck proAccCheck];
+            CheckArr = [ModeCheck PosUBCheck PosLBCheck 1 1 posPCheck posICheck posDCheck proVelCheck proAccCheck];
         end
 
         if any(CheckArr==0)
