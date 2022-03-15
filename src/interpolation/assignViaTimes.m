@@ -12,12 +12,12 @@ function [T,Tend] = assignViaTimes(vias, strat)
 
 % Determine Tend proportional to the max total distance travelled
 maxTotalDist = max(sum(abs(diff(vias))));
-VEL_SCALING = 0.3;      % TODO Tune this
+VEL_SCALING = 0.2;      % TODO Tune this
 maxVel = (getDXLSettings().velocityLimit/60*0.229*4096) * VEL_SCALING;
 % Convert (scaled) RPM to Ticks/second and apply scaling
 Tend = maxTotalDist / maxVel;
 
-Tend = 15;  % fr now
+% Tend = 15;  % fr now
 
 k = size(vias,1)-1;
 
