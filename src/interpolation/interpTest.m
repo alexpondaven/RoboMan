@@ -25,11 +25,13 @@
 %         2 2 2 2];
 
 %% Testing for toy case
-vias = [0 0 0 0
-        1 4 9 1
-        2 5 2 2
-        8 2 4 6];
-Tend =15;
+% vias = [0 0 0 0
+%         1 4 9 1
+%         2 5 2 2
+%         8 2 4 6];
+% Tend =15;
+
+
 
 %% Testing for square case
 % z=90;
@@ -60,13 +62,23 @@ Tend =15;
 % vias % For debugging
 
 % vias = [[0:10]' [0:10]' [0:10]' [0:10]'];
+
 %% Cubic Interpolation
 % [coeffs, T] = interpCubicTraj(vias,Tend)
 % 
 % plotCubicInterp(vias, coeffs, T)
 
 %% Quintic Interpolation
-T = assignViaTimes(vias,Tend,'acc');
-coeffs = interpQuinticTraj(vias, T)
+% T = assignViaTimes(vias,Tend,'acc');
+% coeffs = interpQuinticTraj(vias, T)
+% 
+% plotQuinticInterp(vias, coeffs, T)
 
-plotQuinticInterp(vias, coeffs, T)
+%% Cell array
+vias = {[0 0 0 0
+        1 4 9 1
+        2 5 2 2
+        8 2 4 6]};
+Tend =15;
+
+interpViaPoints
