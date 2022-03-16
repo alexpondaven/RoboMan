@@ -13,13 +13,15 @@ function retCode = setGripperPos(open, port_num)
     if open==true
         targetAngle = 1024;  % claws wide open
     else
-        targetAngle = 2435; % just gripping the cube
+        % gripping the cube
+        % targetAngle = 2435;     % with default gripper
+        targetAngle = 1900 ;     % with our 3d printed gripper
     end
 
     write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(5), params.ADDR_PRO_GOAL_POSITION, targetAngle);
     
     curr_pos = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(5), params.ADDR_PRO_PRESENT_POSITION);
-    while( abs(curr_pos - targetAngle) > 4 )
+    while( abs(curr_pos - targetAngle) > 2 )
         curr_pos = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(5), params.ADDR_PRO_PRESENT_POSITION);
     end
 

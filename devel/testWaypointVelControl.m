@@ -29,7 +29,7 @@ port_num = portHandler(params.DEVICENAME);
 % Initialize PacketHandler Structs
 packetHandler();
 dxl_comm_result = params.COMM_TX_FAIL;           % Communication result
-dxl_error = 0;                              % Dynamixel error
+dxl_error = 0;                                   % Dynamixel error
 
 % Open port
 if (openPort(port_num))

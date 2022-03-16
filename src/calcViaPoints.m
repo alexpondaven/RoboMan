@@ -1,26 +1,20 @@
-function via_paths = calcViaPoints(AStarWaypoints, occupancyGridVect)
-% Calculates a set of via points from one A* waypoint to the next.
+function theta_vias = calcViaPoints(start_waypoint, goal_waypoint, occupancyGrid)
+% Wrapper around AStarSearch and InverseKinDynamixel2. 
+% search for a path in cartesian space and convert it to joint space.
 % Args:
-% AStarWaypoints     : Set of waypoints (x,y,z,theta_g) that end effector has to move through
-% occupancyGridVect  : Vector of occupancy grids (length 1 less than AStarWaypoints) 
-%                      that reflect the state of the world at the point of which the 
-%                      AStar search is ebign conducted.
+% start_waypoint     : Starting waypoint (x,y,z,theta_g) of end effector
+% goal_waypoint      : End waypoint (x,y,z,theta_g) of end effector
+% occupancyGrid      : occupancy grid for A* search
+%
 % Returns:
+% theta_vias : via points of servo1-4 angles
 
-% via_paths : cell array of via paths
-
-via_paths = {};
-for waypoint_idx=1:(size(AStarWaypoints,1)-1)
-    waypoints = AstarSearch(AStarWaypoints(waypoint_idx,:), AStarWaypoints(waypoint_idx+1,:), squeeze(occupancyGridVect(waypoint_idx,:,:,:)) );
-    vias = zeros( size(waypoints, 1)+1, 4 );
+    waypoints = AstarSearch(start_waypoint, goal_waypoint, occupancyGrid );
+    theta_vias = zeros( size(waypoints, 1)+1, 4 );
     for i=1:size(waypoints, 1)
         % Note: Gripper open/close not important here as only theta1..4 taken
         ikResult = inverseKinDynamixel2( waypoints(i,1), waypoints(i,2), waypoints(i,3), waypoints(i,4), true ); 
-        vias(i+1, :) = ikResult(1:4);
+        theta_vias(i+1, :) = ikResult(1:4);
     end
-
-    via_paths(end+1) = {vias};
-end
-
 
 end

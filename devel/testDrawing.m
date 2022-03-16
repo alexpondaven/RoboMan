@@ -98,7 +98,37 @@ if initDynamixels(port_num, 'vel') == 0
      vias = curr_pos;
      for j=1:size(corners, 1)
          % corners(j,:)
-         theta = inverseKinDynamixel3(corners(j, 1), corners(j, 2), corners(j, 3), -pi/2,pi/30,GRIP_POS);
+         %  theta = inverseKinDynamixel3(corners(j, 1), corners(j, 2), corners(j, 3), -pi/2,pi/4,GRIP_POS);
+         theta = inverseKinDynamixel(corners(j, 1), corners(j, 2), corners(j, 3), -pi/4, GRIP_POS);
+         vias = [vias; theta(1:4)];
+     end
+
+      % Interpolate between waypoints
+    [T, Tend] = assignViaTimes(vias, 'dvel');    % Tend no longer used
+    coeffs = interpQuinticTraj(vias, T);
+    figure
+    plotQuinticInterp(vias, coeffs, T);
+
+    mainServoLoop(coeffs, T, Tend, port_num, true, vias);
+
+    %Parms of the circle
+    origin=[100,200,60];
+    radius=40;
+    num_points=20;
+
+    circle=semicircle(origin,radius,num_points);
+
+
+    curr_pos = zeros(1,4);
+     for i=1:4
+         curr_pos(i) = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_POSITION);
+     end
+     
+     currEndpointCoords = getCurrEndpointCoords(curr_pos);
+     %  calculate vias with adajustment to the gripper angle_thetaG  
+     vias = curr_pos;
+     for j=1:size(circle, 1)
+         theta = inverseKinDynamixel(circle(j, 1), circle(j, 2), circle(j, 3), -pi/4, GRIP_POS);
          vias = [vias; theta(1:4)];
      end
 
