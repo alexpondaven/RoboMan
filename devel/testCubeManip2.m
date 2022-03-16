@@ -83,14 +83,35 @@ if initDynamixels(port_num, 'vel') == 0
     
     currEndpointCoords = getCurrEndpointCoords(curr_pos);
 
-    AStarWaypoints = [currEndpointCoords, startPos, endPos];
+    % Cube movements [src cube holder, src height, dst cube holder, dst height, rotation]
+    % start from cubestates in [cubeholder, height, red face location]
+    %                           e.g. {[1,1,"up"],[2,1,"back"]}
+    cubeMoves = [[ 2,1, 2,1, 1]; % Rotate cube at 2 away from arm
+                [ 2,1, 2,1, 1]; % Rotate cube at 2 away from arm
+                [ 1,1, 2,2, 1]];
+    
+    % Get vias for cube movement
+    cube_via_paths = planCubesPath(cubeMoves, cube_locs, cube_hold);
+    %Previously:
+%     startPos = [100, 0, 50, -pi/2];
+%     endPos = [225, 0, 50, 0];
+%     AStarWaypoints = [currEndpointCoords, startPos, endPos];
+
+    
+    % Add vias for gripper movement (without cube)
+    % Between each cube_via_path:
+    % - Get from current position to start of cube_via_path (open gripper)
+    % - Pick up cube
+    % - Go through via points in path
+    % - Drop cube
+
+    AStarWaypoints = [currEndpointCoords; cubeWaypoints];
+
     via_paths = calcViaPoints(AStarWaypoints, occupancyGridVect);   % TODO define occupancyGridVect
 
     [coeff_paths, T, Tend] = interpViaPoints(via_paths, true);
 
-    startPos = [100, 0, 50, -pi/2];
-    endPos = [225, 0, 50, 0];
-
+    
     GRIP_POS = deg2rad(232);
 
     % set isPlot to false for production
