@@ -2,6 +2,7 @@ function occupancyGrid = createOccupancyGrid(cubeStack)
 % createOccupancyGrid
 % Args:
 % cubeStack : a 1D array of heights for the cube stack at each holder.
+% e.g. [0,1,0,0,2,0] represents 1 cube in placeholder 2 and 2 cubes in placeholder 5
 %
 % cubeLocs : a 2D array containing the (i,j,height) values for each
 % cubeHolderLocs : a 2D array containing the (i,j) values for each
