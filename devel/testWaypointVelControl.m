@@ -58,6 +58,10 @@ if initDynamixels(port_num, 'vel') == 0
     servoLimits = getServoLimits();
     velocityLimit = getDXLSettings().velocityLimit;
 
+    % picking up the pen
+    % To do with the gripper tmr
+
+
     % Corners
     z=90;
     square = [ 175 -50 z

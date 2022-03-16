@@ -56,7 +56,8 @@ if initDynamixels(port_num, 'vel') == 0
     %% DO STUFF HERE
 
     % CONSTANTS
-    GRAB_DEPTH = 10; % TUNE : How far to descend when grabbing/picking cube
+    ogParams = getOccupancyGridParams();
+    GRAB_DEPTH = ogParams.HOVER_HEIGHT + ogParams.CUBE_DIM/2; % How far to descend when grabbing/picking cube
     isPlot = true;
 
     % Setup
@@ -69,7 +70,8 @@ if initDynamixels(port_num, 'vel') == 0
     end
     currEndpointCoords = getCurrEndpointCoords(curr_pos);
 
-    % Cube movements [src cube holder, dst cube holder, rotation]
+    % SET CUBE MOVEMENTS
+    % Format:  [src cube holder, dst cube holder, rotation]
     %           rotation:
     %           - 0 : no rotation
     %           - -1: towards robot

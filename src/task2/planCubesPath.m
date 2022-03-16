@@ -33,8 +33,9 @@ function [via_paths, isHoldingCube, waypoints] = planCubesPath(cubeMoves, cubeSt
 % via_paths      : cell array of via points for each path (each via point is 4 values for joint angles)
 % isHoldingCube  : array saying if via_path involvs holding the cube (if so must pick up and drop cube at begin/end of path)
 
-CUBE_SIZE = 25; 
-HEIGHT_OFFSET = 40; % TUNE : Position above cube that can be reached in occupancy grid
+ogParams = getOccupancyGridParams();
+CUBE_SIZE = ogParams.CUBE_DIM;
+HEIGHT_OFFSET = ogParams.HOLDER_HEIGHT + ogParams.HOVER_HEIGHT; % Position above cube that can be reached in occupancy grid
 
 currCubeStacks = cubeStacks;
 via_paths = {};

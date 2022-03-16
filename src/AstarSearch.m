@@ -175,15 +175,15 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
                                         % ii) else, compute both g and h for successor
                                         % successor.g = q.g + distance between successor and q
                                         curr_g = cellDetails.gCost( p_theta_g, p_theta_1, p_x, p_y ) ...
-                                        + rssq([theta_g_change/2, theta_1_change, x_change, y_change]);
-                                        
+                                        + sqrt( sum( [theta_g_change/2, theta_1_change, x_change, y_change].^2 ));
+
                                         % successor.h = distance from goal to successor using heuristic
                                         % We use a straight-line heuristic.
                                         theta_g_dist = curr_theta_g - goalIdx(1);
                                         theta_1_dist = curr_theta_1 - goalIdx(2);
                                         x_dist = curr_x - goalIdx(3);
                                         y_dist = curr_y - goalIdx(4);
-                                        curr_h = rssq([theta_g_dist/2, theta_1_dist, x_dist, y_dist]);
+                                        curr_h = sqrt( sum( [theta_g_dist/2, theta_1_dist, x_dist, y_dist].^2 ));
                                         
                                         % successor.f = successor.g + successor.h
                                         curr_f = curr_g + curr_h;
