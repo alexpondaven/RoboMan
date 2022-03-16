@@ -56,8 +56,8 @@
 - [ ] Test performance of velocity-based control with pen (may tilt)
   - [ ] Make sure 3d printed gripper can hold the pen and it doesn't tilt (find out coords to pick up vertically)
   - [ ] Make sure it can get to all positions possible on the drawing board
-- [ ] Convert shapes to draw into waypoints or endpoints
-  - [ ] HELPER: Translate center of the arc, the radius, the degrees of the arc and the start and end co-ordinates into set of waypoints along this arc
+- [x] Convert shapes to draw into waypoints or endpoints
+  - [x] HELPER: Translate center of the arc, the radius, the degrees of the arc and the start and end co-ordinates into set of waypoints along this arc
   - [x] HELPER: Translation function for interpolating line between waypoints (should have this already)
 - [ ] Plan out entire trajectory
   1. Pick up pen
@@ -114,7 +114,7 @@ for each adjacent position:
   - [ ] Test and tune cube translation for 1 cube in 3 locations
   - [ ] Test cube rotation for 1 cube in 3 locations
 - Task 3
-  - [ ] Convert shapes to draw into waypoints or endpoints
+  - [x] Convert shapes to draw into waypoints or endpoints
   - [ ] Figure out starting position of robot and pen
   - [ ] Change end effector position to end of pen
 
@@ -133,3 +133,6 @@ for each adjacent position:
 ### By now, we **should** have finished filming Tasks 2.1, 2.2 and 3.
 - Start thinking about implementing self-proposed task.
 - Start writing report
+
+
+
