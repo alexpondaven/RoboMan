@@ -12,6 +12,8 @@ function occupancyGrid = createOccupancyGrid(cubeStack)
 % has been occupied.
 
     % CubeStack: [idx,height]
+    % TODO: Change from this representation to cubeStack is 1d array with ith placeholder height in ith idx of array
+    % e.g. [0,1,0,0,2,0] represents 1 cube in placeholder 2 and 2 cubes in placeholder 5
     
     %% Function parameters
     ogParams = getOccupancyGridParams();
