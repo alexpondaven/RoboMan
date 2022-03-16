@@ -1,37 +1,44 @@
-function [via_paths,isBringCube] = planCubesPath(initCubesState, goalCubesState)
-% planCubesPath     Determine via points to move cubes in initCubeState to
-% desired goalCubeState.
-%
-% Each via path has corresponding boolean whether to bring cube
-% - If bring cube, first pick up, go through path, then drop cube
+function via_paths = planCubesPath(cubeMoves)
+% planCubesPath     Determine via paths from cube movements
+%  Note: Just includes movements involving cubes, so extra via paths to go
+%  to next start position must be added for full path planning.
 %
 % Args
-% initCubesState : array of initial cube states
-%          [cube holder number, cube stack height, cube orientation]
-%           cube orientation:
-%           - "up": upwards
-%           - "back": towards robot
-%           - "front": away from robot
-%           - "down": downwards
-% goalCubesState : array of final cube states
+% cubeMoves : array of cube movements
+%          cube move = [src cube holder, src height, dst cube holder, dst height, rotation]
+%           cube rotation:
+%           - 0 : no rotation
+%           - -1: towards robot
+%           - 1: away from robot
+%   cubestates in [cubeholder, height, red face location]
+%   e.g. {[1,1,"up"],[2,1,"back"]}
+%   -> {[1,1,"up"],[2,1,"front"]}
+%   -> {[2,2,"front"],[2,1,"front"]}
+% 
+%   cubeMoves = [[ 2,1, 2,1 1]; % Rotate cube at 2 away from arm
+%               [ 2,1, 2,1, 1]; % Rotate cube at 2 away from arm
+%               [ 1,1, 2,2, 1]] % Move 1 to 2 (height 2) while
+%               rotating away from arm
+% 
+%
+%   Note: assume path is possible
+%   Extension: Generate entire path automatically - requires a lot of checks,
+%   that can easily lead to non-optimal path taken (this is safer)
 %
 % Return
 % via_paths      : cell array of via points for each path
-% bring_cube     : list of whether to carry cubes
 
 CUBE_SIZE = 25;
 HEIGHT_OFFSET = 40; % Position above cube that can be reached in occupancy grid
 
 via_paths = {};
-isBringCube = [];
-% Plan trajectory for every cube
-for i=1:size(initState,1)
-    srcPos = initCubesState(i,1);
-    srcStack = initCubesState(i,2);
-    srcOrient = initCubesState(i,3);
-    dstPos = goalCubesState(i,1);
-    dstStack = goalCubesState(i,2);
-    dstOrient = goalCubesState(i,3);
+% Determine vias for every cube movement path
+for i=1:size(cubeMoves,1)
+    srcPos = cubeMoves(i,1);
+    srcHeight = cubeMoves(i,2);
+    dstPos = cubeMoves(i,3);
+    dstHeight = cubeMoves(i,4);
+    rotate = cubeMoves(i,5);
 
     % Get x,y coordinates of source and destination positions
     % TODO: remove src_thetaG and dst_thetaG from getHolderCoord as it just
@@ -40,87 +47,38 @@ for i=1:size(initState,1)
     [dst_x, dst_y, dst_thetaG] = getHolderCoord(dstPos);
 
     % Get height above cubes
-    src_z = HEIGHT_OFFSET + srcStack * CUBE_SIZE;
-    dst_z = HEIGHT_OFFSET + dstStack * CUBE_SIZE;
+    src_z = HEIGHT_OFFSET + srcHeight * CUBE_SIZE;
+    dst_z = HEIGHT_OFFSET + dstHeight * CUBE_SIZE;
 
     % TODO: Experiment if we need to add offset to z depending on orientation grabbed?
 
-
     vias = [];
 
-    % Determine if rotate away or towards bot
     % Rotate away involves theta_g = 0 -> theta_g = -pi/2
     % Rotate towards involves theta_g = -pi/2 -> theta_g = 0
-    % If rotating 180 degrees, just rotate away twice
-
-    % Express orientation as imaginary number
-    srcOrientImag = orientToImag(srcOrient);
-    dstOrientImag = orientToImag(dstOrient);
-    
-    switch srcOrientImag / dstOrientImag
-        case 1i
-            % Rotate towards arm while translating?
-            src_thetaG = -pi/2;
+    switch rotate
+        case 0 % No rotation
+            src_thetaG = 0;
             dst_thetaG = 0;
-            
-            % src is always on cubeholder, so can pick up with thetaG=-pi/2
-            [_,ec] = inverseKin2(dst_x, dst_y, dst_z, dst_thetaG, false);
-            if ec ~= 0
-                % Rotate in-place
-                viasRotate = AstarSearch([src_x, src_y, src_z, src_thetaG], [src_x, src_y, src_z, dst_thetaG])
-                vias = [vias; viasRotate]
-                isBringCube(end+1) = true;
-            end
-
-        case -1i
-            % Rotate away from arm while translating?
+        case 1 % Rotate away from robot
             src_thetaG = 0;
             dst_thetaG = -pi/2;
-            % Assume all positions can be grabbed with thetaG=0
-
-            % Check if destination position cannot be reached with thetaG = -pi/2
-            [_,ec] = inverseKin2(dst_x, dst_y, dst_z, dst_thetaG, false);
-            if ec ~= 0
-                % Rotate in-place
-                viasRotate = AstarSearch([src_x, src_y, src_z, src_thetaG], [src_x, src_y, src_z, dst_thetaG])
-                vias = [vias; viasRotate]
-                isBringCube(end+1) = true;
-            end
-
-        case -1
-            % Rotate 180 degrees (rotate away from arm twice)
-
-            % First add rotation motion to positions
-
-            % Then set up thetaGs to change when translating
-
-        case 1
-            % No rotation required
-        
+        case -1 % Rotate towards robot
+            src_thetaG = -pi/2;
+            dst_thetaG = 0;
         otherwise
-            disp("u wut m8")
-
+            disp("Not a valid rotation for cube movement")
     end
 
-    % Determine where to translate cube
-    
-    
+    % Calculate via points for path
+    viaCoords = AstarSearch([src_x, src_y, src_z, src_thetaG], [dst_x, dst_y, dst_z, dst_thetaG]);
+    % Convert to joint angles (assume always holding cube for these cube
+    % movement paths)
+    inverseKinRes = inverseKinDynamixel2( viaCoords(i,1), viaCoords(i,2), viaCoords(i,3), viaCoords(i,4), true);
 
-    % Convert via coordinates to joint angles
+    vias = [vias; inverseKinRes];
     
-    for pos=2:size(positions,2)
-        isBringCube(end+1) = positions(pos,5);
-        % Get path between positions
-        viaCoords = AstarSearch(positions(pos-1,1:4), positions(pos,1:4));
-
-        % Convert to joint angles
-        inverseKinRes = inverseKinDynamixel2( viaCoords(i,1), viaCoords(i,2), viaCoords(i,3), viaCoords(i,4), positions(pos,5));
-
-        vias = [vias; inverseKinRes];
-    end
     via_paths(end+1) = {vias};
-
-
 
 end
 
