@@ -32,7 +32,6 @@ function [via_paths, isHoldingCube, waypoints] = planCubesPath(cubeMoves, cubeSt
 % Return
 % via_paths      : cell array of via points for each path (each via point is 4 values for joint angles)
 % isHoldingCube  : array saying if via_path involvs holding the cube (if so must pick up and drop cube at begin/end of path)
-
 ogParams = getOccupancyGridParams();
 CUBE_SIZE = ogParams.CUBE_DIM;
 HEIGHT_OFFSET = ogParams.HOLDER_HEIGHT + ogParams.HOVER_HEIGHT; % Position above cube that can be reached in occupancy grid
@@ -89,7 +88,7 @@ for i=1:size(cubeMoves,1)
     % Calculate via points for movement to src
     moveToStartWaypoints = [curr_pos;
                             [src_x, src_y, src_z, src_thetaG]];
-    vias = calcViaPoints(moveToStartWaypoints(1), moveToStartWaypoints(2), occupancyGrid);
+    vias = calcViaPoints(moveToStartWaypoints(1,:), moveToStartWaypoints(2,:), occupancyGrid);
 
     via_paths(end+1) = {vias};
     isHoldingCube(end+1) = false;
@@ -98,9 +97,8 @@ for i=1:size(cubeMoves,1)
     % Calculate via points for movement of cube
     moveCubeWaypoints = [[src_x, src_y, src_z, src_thetaG];
                         [dst_x, dst_y, dst_z, dst_thetaG]];
-    vias = calcViaPoints(moveCubeWaypoints(1), moveCubeWaypoints(2), occupancyGrid);
+    vias = calcViaPoints(moveCubeWaypoints(1,:), moveCubeWaypoints(2,:), occupancyGrid);
 
-    % Calul
     via_paths(end+1) = {vias};
     isHoldingCube(end+1) = true;
     waypoints(end+1) = {moveCubeWaypoints};

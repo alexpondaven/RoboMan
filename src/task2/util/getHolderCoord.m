@@ -32,7 +32,8 @@ switch holderNum
         grid = [0,4];
         thetaG = -pi/2;
     otherwise
-        warning("Invalid holder number - only 6 cube holders exist")
+        disp("Invalid holder number - only 6 cube holders exist")
+        return
 end
 coord = grid * CUBE_SIZE;
 x = coord(1);
