@@ -63,11 +63,11 @@ while ~( last_seg && all( abs(curr_err) < 10 ) )
     % Convert sampled joint velocity from ticks/s to rev/min. One unit = 0.229 RPM
     jointVel = round( (jointVel * 60 / 4096) / 0.229 );
     
-    startLoopTime = now;
+    % startLoopTime = now;
 
     for i=1:4
         % Motor will clamp to velocity limits automatically
-        startReadTime = now;
+        % startReadTime = now;
         curr_pos(i) = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_POSITION);
         
         if curr_pos(i) > servoLimits(i,2) || curr_pos(i) < servoLimits(i,1)
@@ -85,10 +85,10 @@ while ~( last_seg && all( abs(curr_err) < 10 ) )
         curr_vel(i) = twos2decimal(read4ByteTxRx (port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_VELOCITY), 32 );
         write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_GOAL_VELOCITY, typecast(int32(jointVel(i)), 'uint32') );
         
-        fprintf("Overall time for one read-write cycle: %0.4f\n", (now-startLoopTime) * 24*60*60);
+        % fprintf("Overall time for one read-write cycle: %0.4f\n", (now-startLoopTime) * 24*60*60);
     end
 
-    fprintf("Overall time for one loop: %0.4f\n", (now-startLoopTime) * 24*60*60);
+    % fprintf("Overall time for one loop: %0.4f\n", (now-startLoopTime) * 24*60*60);
 
     curr_time = (now-start_time) * 24 * 60 * 60;
     curr_err = desiredPos - curr_pos; % Difference between sampled quintic position and measured position

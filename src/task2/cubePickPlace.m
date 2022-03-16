@@ -25,6 +25,13 @@ function retCode = cubePickPlace(goalPos, cubePos, nextStartPos, pickOrPlace, po
     endGripperPos = ~pickOrPlace;
     params = getDXLParams();
 
+    % assert that gripper is indeed in desired position
+    if pickOrPlace == true 
+        setGripperPos(true, port_num);  % open gripper
+    else
+        setGripperPos(false, port_num); % make sure grip is tight
+    end
+
     %% Generate trajectory from goalPos -> cubePos
     viaCoords = linearInterpolate(goalPos, cubePos, numPoints);
     viaAngles = zeros( size(viaCoords) );
@@ -58,7 +65,7 @@ function retCode = cubePickPlace(goalPos, cubePos, nextStartPos, pickOrPlace, po
     if pickOrPlace == true 
         setGripperPos(false, port_num); % Grip cube
     else
-        setGripperPos(true, port_num); % let cube go
+        setGripperPos(true, port_num);  % let cube go
     end
 
 

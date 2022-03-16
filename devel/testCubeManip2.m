@@ -55,71 +55,76 @@ end
 if initDynamixels(port_num, 'vel') == 0
     %% DO STUFF HERE
 
+    % CONSTANTS
+    GRAB_DEPTH = 10; % TUNE : How far to descend when grabbing/picking cube
+    isPlot = true;
+
+    % Setup
     servoLimits = getServoLimits();
     velocityLimit = getDXLSettings().velocityLimit;
-
-    % Initialize occupancy grid
-    cube_locs = [ [3,-8, 0]; [9, 0, 0]; [6, 6, 0] ].';
-    % We take the transpose to be able to index properly
-    % Grid i,j coordinates, as well as current height
-    % (in stacking terms) of the cube
-    cube_hold = [ [3,-8]; [5,-5]; [4, 0]; [9, 0]; [0, 4]; [6, 6] ].';
-
-    occupancyGrid = createOccupancyGrid(cube_locs, cube_hold);
-
-    % Phase 1: Move from current position to startPos
-    % TODO
-
-    % Phase 2: Grip cube (move from startPos (open) -> cubePos (open) -> cubePos(closed) -> startPos(closed))
-    % TODO
-    
-    % Phase 3: Move from startPos (closed) to endPos (closed)
-    % Try to rotate cube at (9,0)
     
     curr_pos = zeros(1,4);
     for i=1:4
         curr_pos(i) = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_POSITION);
     end
-    
     currEndpointCoords = getCurrEndpointCoords(curr_pos);
 
-    % Cube movements [src cube holder, src height, dst cube holder, dst height, rotation]
-    % start from cubestates in [cubeholder, height, red face location]
-    %                           e.g. {[1,1,"up"],[2,1,"back"]}
-    cubeMoves = [[ 2,1, 2,1, 1]; % Rotate cube at 2 away from arm
-                [ 2,1, 2,1, 1]; % Rotate cube at 2 away from arm
-                [ 1,1, 2,2, 1]];
+    % Cube movements [src cube holder, dst cube holder, rotation]
+    %           rotation:
+    %           - 0 : no rotation
+    %           - -1: towards robot
+    %           - 1: away from robot
+    %   Cube states defines state of cubes (just for us to write state down easily): 
+    %               [cubeholder, height, red face location]
+    %                e.g. {[1,1,"up"],[2,1,"back"]} describes cube on holder1 facing up and cube on holder2 facing back (towards robot)
+    cubeMoves = [[2,2,1]; % Rotate cube at 2 away from arm
+                [2,2,1]; % Rotate cube at 2 away from arm
+                [1,2,1]];
+    cubeStacks = [1,1,0,0,0,0];
     
     % Get vias for cube movement
-    cube_via_paths = planCubesPath(cubeMoves, cube_locs, cube_hold);
-    %Previously:
-%     startPos = [100, 0, 50, -pi/2];
-%     endPos = [225, 0, 50, 0];
-%     AStarWaypoints = [currEndpointCoords, startPos, endPos];
+    [cube_via_paths, path_isholdingcube, waypoints] = planCubesPath(cubeMoves, cubeStacks, currEndpointCoords);
+    % Interpolate between via points
+    [coeff_paths, T_paths, Tend_paths] = interpViaPoints(cube_via_paths(i), isPlot);
 
-    
-    % Add vias for gripper movement (without cube)
-    % Between each cube_via_path:
-    % - Get from current position to start of cube_via_path (open gripper)
-    % - Pick up cube
-    % - Go through via points in path
-    % - Drop cube
+    % For each path
+    % - Check if path is holding cube
+    % - If moving cube:
+    %   - Grab cube
+    %   - Follow path
+    %   - Drop cube
+    % - Otherwise, just move path
 
-    AStarWaypoints = [currEndpointCoords; cubeWaypoints];
+    % Movement code
+    for i=1:size(path_isholdingcube,1)
+        if path_isholdingcube{i}
+            path_waypoints = waypoints{i};
+            startPos = path_waypoints(1,:);
+            endPos = path_waypoints(2,:);
+            
+            % Grab cube
+            if cubePickPlace(startPos, startPos - GRAB_DEPTH, startPos, true, port_num) ~= 0
 
-    via_paths = calcViaPoints(AStarWaypoints, occupancyGridVect);   % TODO define occupancyGridVect
+            end
+            
+            % Follow trajectory
+            if mainServoLoop(coeff_paths(i), T_paths(i), Tend_paths(i), port_num, isPlot) ~= 0
 
-    [coeff_paths, T, Tend] = interpViaPoints(via_paths, true);
+            end
 
-    
-    GRIP_POS = deg2rad(232);
+            % Drop cube
+            if cubePickPlace(endPos, endPos - GRAB_DEPTH, endPos, false, port_num) ~= 0
+            
+            end
 
-    % set isPlot to false for production
-    if mainServoLoop(coeffs, T, Tend, port_num, true) ~= 0
-        % ? Refactor such that it will GOTO END
+        else
+            % Follow trajectory
+            if mainServoLoop(coeff_paths(i), T_paths(i), Tend_paths(i), port_num, isPlot) ~= 0
+
+            end
+        end
     end
 
-    % Phase 4: Deposit cube (move from endPos (closed) -> cubePos (closed) -> cubePos(open) -> endPos(open))
 
 end
 

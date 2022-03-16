@@ -1,4 +1,4 @@
-function [coeff_paths, T, Tend] = interpViaPoints(via_paths, isPlot)
+function [coeff_paths, T_paths, Tend_paths] = interpViaPoints(via_paths, isPlot)
 % interpViaPoints  Interpolate using quintic between via points and return coeffs
 %
 % Args
@@ -7,10 +7,12 @@ function [coeff_paths, T, Tend] = interpViaPoints(via_paths, isPlot)
 %
 % Return
 % coeff_paths   : Cell array of coefficients for each path
-% T     : Time of each via point (should be same #rows as vias)
-% Tend  : Time to reach last via point
+% T_paths       : Time of each via point (should be same #rows as vias) - for each path
+% Tend_paths    : Time to reach last via point - for each path
 
     coeff_paths = {};
+    T_paths = {};
+    Tend_paths = {};
     for i=1:size(via_paths,1)
         % Start with current position? - but we don't know current position after every segment
         % Assume at correct position at start of segment after mainServoLoop is run
@@ -27,6 +29,8 @@ function [coeff_paths, T, Tend] = interpViaPoints(via_paths, isPlot)
         end
 
         coeff_paths(end+1) = {coeffs};
+        T_paths(end+1) = T;
+        Tend_paths(end+1) = Tend;
     end
 
 end
