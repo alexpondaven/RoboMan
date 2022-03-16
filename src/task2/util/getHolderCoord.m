@@ -10,7 +10,7 @@ function [x,y,thetaG] = getHolderCoord(holderNum)
 % x         : Distance in x direction (mm)
 % y         : Distance in y direction (mm)
 % theta_g   : Orientation of end effector (radians)
-CUBE_SIZE = 25;
+CUBE_SIZE = getOccupancyGridParams().CUBE_DIM;  % 25
 
 switch holderNum
     case 1
