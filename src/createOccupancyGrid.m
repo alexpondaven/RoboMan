@@ -1,7 +1,7 @@
 function occupancyGrid = createOccupancyGrid(cubeStack)
 % createOccupancyGrid
 % Args:
-% cubeStack : a 2D array of (idx, height) saying the index and height of cube stack at each holder.
+% cubeStack : a 1D array of heights for the cube stack at each holder.
 %
 % cubeLocs : a 2D array containing the (i,j,height) values for each
 % cubeHolderLocs : a 2D array containing the (i,j) values for each
@@ -10,8 +10,6 @@ function occupancyGrid = createOccupancyGrid(cubeStack)
 % occupancyGrid : a 4D uint8 matrix indexed by 
 % (theta_g, theta_1, x', y') where 1 indicates a particular location 
 % has been occupied.
-
-    % CubeStack: [idx,height]
     
     %% Function parameters
     ogParams = getOccupancyGridParams();
@@ -42,59 +40,61 @@ function occupancyGrid = createOccupancyGrid(cubeStack)
                 x = X_LIST(x_idx);
 
                 % Iterate over cube holder locs
-                for cubeHolderIdx=1:size(cubeStack, 1)
-                    % Iterate over cube holders
-                    [holder_x, holder_y, ~] = getHolderCoord(cubeStack(cubeHolderIdx,1));
-                    holder_xPrime = hypot( holder_x, holder_y );
-                    holder_theta1 = atan2(holder_y, holder_x);
-
-                    % Upper and lower angular bounds for holder
-                    holder_theta_bound = atan2(HOLDER_DIM/2, (holder_xPrime-HOLDER_DIM/2)); 
-                    % look at Task2>Cube Manipulation for diagram
-                    holder_theta1_ub = holder_theta1 + holder_theta_bound;
-                    holder_theta1_lb = holder_theta1 - holder_theta_bound;
-
-                    if ((holder_xPrime+HOLDER_DIM/2 >= x) && (holder_xPrime-HOLDER_DIM/2 <= x)) && ...
-                       ((y >= 0) && (y <= HOLDER_HEIGHT)) && ...
-                       ((holder_theta1_ub >= theta_1)   && (holder_theta1_lb <= theta_1)  )
-
-                        % fprintf("holder ub: %0.2f | lb: %0.2f\n", rad2deg(holder_theta1_ub), rad2deg(holder_theta1_lb));
-                        % fprintf("holder at x': %0.2f theta1: %0.2f (i:%d j: %d) collides\n", ...
-                        %     holder_xPrime, rad2deg(holder_theta1), holder_x, holder_y);
-                        % fprintf("with current coordinates, x': %0.2f, y': %0.2f, theta1: %0.2f\n", ...
-                        %     x, y, rad2deg(theta_1));
-                        % fprintf("Writing to occupancy grid indexes %d %d %d\n\n", ...
-                        %     theta_1_idx, y_idx, x_idx );
-
-                        occupancyGrid(theta_1_idx, x_idx, y_idx) = 1;
-                    end
-                    
-                    % Check the height of the cube stack at each of the cube holders
-                    cubeHeight = cubeStack(cubeHolderIdx, 2);
-                    if cubeHeight >= 1
-                        cube_xPrime = holder_xPrime;
-                        cube_yPrime = cubeHeight*CUBE_DIM + HOLDER_HEIGHT;  % Height of top of cube stack
-                        cube_theta1 = holder_theta1;
-
-                        % Upper and lower angular bounds for each cube
-                        cube_theta_bound = atan2(CUBE_DIM/2, (cube_xPrime-CUBE_DIM/2));
+                for cubeHolderIdx=1:size(cubeStack, 2)
+                    if cubeStack(cubeHolderIdx)~=0
+                        % Iterate over cube holders
+                        [holder_x, holder_y, ~] = getHolderCoord(cubeHolderIdx);
+                        holder_xPrime = hypot( holder_x, holder_y );
+                        holder_theta1 = atan2(holder_y, holder_x);
+    
+                        % Upper and lower angular bounds for holder
+                        holder_theta_bound = atan2(HOLDER_DIM/2, (holder_xPrime-HOLDER_DIM/2)); 
                         % look at Task2>Cube Manipulation for diagram
-                        cube_theta1_ub = cube_theta1 + cube_theta_bound;
-                        cube_theta1_lb = cube_theta1 - cube_theta_bound;
-
-                        if ((cube_xPrime+CUBE_DIM/2 >= x) && (cube_xPrime-CUBE_DIM/2 <= x)) && ...
-                        ((cube_yPrime >= y) && (0 <= y)) && ...
-                        ((cube_theta1_ub >= theta_1)   && (cube_theta1_lb <= theta_1)  )
-
-                            % fprintf("cube ub: %0.2f | cube lb: %0.2f\n", rad2deg(cube_theta1_ub), rad2deg(cube_theta1_lb));
-                            % fprintf("cube at x': %0.2f y': %0.2f theta1: %0.2f (i:%d j: %d) collides\n", ...
-                            %     cube_xPrime, cube_yPrime, rad2deg(cube_theta1), holder_x, holder_y);
+                        holder_theta1_ub = holder_theta1 + holder_theta_bound;
+                        holder_theta1_lb = holder_theta1 - holder_theta_bound;
+    
+                        if ((holder_xPrime+HOLDER_DIM/2 >= x) && (holder_xPrime-HOLDER_DIM/2 <= x)) && ...
+                           ((y >= 0) && (y <= HOLDER_HEIGHT)) && ...
+                           ((holder_theta1_ub >= theta_1)   && (holder_theta1_lb <= theta_1)  )
+    
+                            % fprintf("holder ub: %0.2f | lb: %0.2f\n", rad2deg(holder_theta1_ub), rad2deg(holder_theta1_lb));
+                            % fprintf("holder at x': %0.2f theta1: %0.2f (i:%d j: %d) collides\n", ...
+                            %     holder_xPrime, rad2deg(holder_theta1), holder_x, holder_y);
                             % fprintf("with current coordinates, x': %0.2f, y': %0.2f, theta1: %0.2f\n", ...
                             %     x, y, rad2deg(theta_1));
-                            % fprintf("Writing to occupancy grid indexes: %d %d %d\n\n", ...
+                            % fprintf("Writing to occupancy grid indexes %d %d %d\n\n", ...
                             %     theta_1_idx, y_idx, x_idx );
-                            
+    
                             occupancyGrid(theta_1_idx, x_idx, y_idx) = 1;
+                        end
+                        
+                        % Check the height of the cube stack at each of the cube holders
+                        cubeHeight = cubeStack(cubeHolderIdx);
+                        if cubeHeight >= 1
+                            cube_xPrime = holder_xPrime;
+                            cube_yPrime = cubeHeight*CUBE_DIM + HOLDER_HEIGHT;  % Height of top of cube stack
+                            cube_theta1 = holder_theta1;
+    
+                            % Upper and lower angular bounds for each cube
+                            cube_theta_bound = atan2(CUBE_DIM/2, (cube_xPrime-CUBE_DIM/2));
+                            % look at Task2>Cube Manipulation for diagram
+                            cube_theta1_ub = cube_theta1 + cube_theta_bound;
+                            cube_theta1_lb = cube_theta1 - cube_theta_bound;
+    
+                            if ((cube_xPrime+CUBE_DIM/2 >= x) && (cube_xPrime-CUBE_DIM/2 <= x)) && ...
+                            ((cube_yPrime >= y) && (0 <= y)) && ...
+                            ((cube_theta1_ub >= theta_1)   && (cube_theta1_lb <= theta_1)  )
+    
+                                % fprintf("cube ub: %0.2f | cube lb: %0.2f\n", rad2deg(cube_theta1_ub), rad2deg(cube_theta1_lb));
+                                % fprintf("cube at x': %0.2f y': %0.2f theta1: %0.2f (i:%d j: %d) collides\n", ...
+                                %     cube_xPrime, cube_yPrime, rad2deg(cube_theta1), holder_x, holder_y);
+                                % fprintf("with current coordinates, x': %0.2f, y': %0.2f, theta1: %0.2f\n", ...
+                                %     x, y, rad2deg(theta_1));
+                                % fprintf("Writing to occupancy grid indexes: %d %d %d\n\n", ...
+                                %     theta_1_idx, y_idx, x_idx );
+                                
+                                occupancyGrid(theta_1_idx, x_idx, y_idx) = 1;
+                            end
                         end
                     end
                 end
