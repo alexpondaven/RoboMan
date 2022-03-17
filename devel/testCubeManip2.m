@@ -20,7 +20,8 @@ end
 
 % Load Libraries
 if ~libisloaded(lib_name)
-    [notfound, warnings] = loadlibrary(lib_name, 'dynamixel_sdk.h', 'addheader', 'port_handler.h', 'addheader', 'packet_handler.h');
+    [notfound, warnings] = loadlibrary(lib_name, 'dynamixel_sdk.h', 'addheader', 'port_handler.h', 'addheader', 'packet_handler.h', ...
+    'addheader', 'group_sync_write.h', 'addheader', 'group_sync_read.h', 'addheader', 'group_bulk_read.h', 'addheader', 'group_bulk_write.h');
 end
 
 params = getDXLParams();
@@ -82,7 +83,7 @@ if initDynamixels(port_num, 'vel') == 0
     %               [cubeholder, height, red face location]
     %                e.g. {[1,1,"up"],[2,1,"back"]} describes cube on holder1 facing up and cube on holder2 facing back (towards robot)
     cubeMoves = [2,2,1];
-    cubeStacks = [1,1,0,0,0,0];
+    cubeStacks = [0,1,0,0,0,0];
     
     % Get vias for cube movement
     [cube_via_paths, path_isholdingcube, waypoints] = planCubesPath(cubeMoves, cubeStacks, currEndpointCoords);
@@ -99,38 +100,44 @@ if initDynamixels(port_num, 'vel') == 0
 
     % Movement code
     for i=1:size(path_isholdingcube,2)
-        if path_isholdingcube(i)
-            path_waypoints = waypoints{i};
-            startPos = path_waypoints(1,:);
-            endPos = path_waypoints(2,:);
-            
-            % Grab cube
-            "Grab cube"
-            if cubePickPlace(startPos, startPos - GRAB_DEPTH, startPos, true, port_num) ~= 0
-                disp("Grab cube failed")
-                return
-            end
-            
-            % Follow trajectory
-            "Move cube"
-            if mainServoLoop(coeff_paths{i}, T_paths{i}, Tend_paths{i}, port_num, isPlot, cube_via_paths{i}) ~= 0
-                disp("Move cube failed")
-                return
-            end
-
-            % Drop cube
-            "Drop cube"
-            if cubePickPlace(endPos, endPos - GRAB_DEPTH, endPos, false, port_num) ~= 0
-                disp("Drop cube failed")
-                return
-            end
-
+        if Tend_paths{i} <= 0
+            disp("[testCubeManip2] No move necessary");
+            continue
         else
-            % Follow trajectory
-            "Move arm"
-            if mainServoLoop(coeff_paths{i}, T_paths{i}, Tend_paths{i}, port_num, isPlot, cube_via_paths{i}) ~= 0
-                disp("Move arm failed")
-                return
+            if path_isholdingcube(i)
+                path_waypoints = waypoints{i};
+                startPos = path_waypoints(1,:);
+                endPos = path_waypoints(2,:);
+                
+                % Grab cube
+                disp("[testCubeManip2] Grab cube");
+                if cubePickPlace(startPos, startPos - [0,0,GRAB_DEPTH,0], startPos, true, port_num) ~= 0
+                    disp("[testCubeManip2] Grab cube failed")
+                    return
+                end
+                
+                % Follow trajectory
+                disp("[testCubeManip2] Move cube");
+                if mainServoLoop2(coeff_paths{i}, T_paths{i}, Tend_paths{i}, port_num, isPlot, cube_via_paths{i}) ~= 0
+                    disp("[testCubeManip2] Move cube failed")
+                    return
+                end
+
+                % Drop cube
+                disp("[testCubeManip2] Drop cube");
+                % Smaller depth for dropping 
+                if cubePickPlace(endPos, endPos - [0,0,GRAB_DEPTH-20,0], endPos, false, port_num) ~= 0
+                    disp("[testCubeManip2] Drop cube failed")
+                    return
+                end
+
+            else
+                % Follow trajectory
+                disp("[testCubeManip2] Move arm");
+                if mainServoLoop2(coeff_paths{i}, T_paths{i}, Tend_paths{i}, port_num, isPlot, cube_via_paths{i}) ~= 0
+                    disp("[testCubeManip2] Move arm failed")
+                    return
+                end
             end
         end
     end
