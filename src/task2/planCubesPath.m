@@ -35,6 +35,7 @@ function [via_paths, isHoldingCube, waypoints] = planCubesPath(cubeMoves, cubeSt
 ogParams = getOccupancyGridParams();
 CUBE_SIZE = ogParams.CUBE_DIM;
 HEIGHT_OFFSET = ogParams.HOLDER_HEIGHT + ogParams.HOVER_HEIGHT; % Position above cube that can be reached in occupancy grid
+TOPGRAB_OFFSET = ogParams.TOPGRAB_OFFSET;
 
 currCubeStacks = cubeStacks;
 via_paths = {};
@@ -59,7 +60,8 @@ for i=1:size(cubeMoves,1)
     src_z = HEIGHT_OFFSET + srcHeight * CUBE_SIZE;
     dst_z = HEIGHT_OFFSET + dstHeight * CUBE_SIZE;
 
-    % TODO: Experiment if we need to add offset to z depending on orientation grabbed?
+    
+
 
     % Rotate away involves theta_g = 0 -> theta_g = -pi/2
     % Rotate towards involves theta_g = -pi/2 -> theta_g = 0
@@ -77,6 +79,11 @@ for i=1:size(cubeMoves,1)
             disp("Not a valid rotation for cube movement")
     end
 
+    % TODO: Experiment if we need to add offset to z depending on orientation grabbed?
+    if src_thetaG == -pi/2
+        src_z = src_z + TOPGRAB_OFFSET;
+    end
+
     % Generate occupancy grid
     % Convert cubestacks to input to createOccupancyGrid
     occupancyGrid = createOccupancyGrid(currCubeStacks);
@@ -85,7 +92,7 @@ for i=1:size(cubeMoves,1)
     currCubeStacks(srcPos) = currCubeStacks(srcPos) - 1;
     currCubeStacks(dstPos) = currCubeStacks(dstPos) + 1;
 
-    % Calculate via points for movement to src
+    % Calculate via points for movement to src (position above cube)
     moveToStartWaypoints = [curr_pos;
                             [src_x, src_y, src_z, src_thetaG]];
     vias = calcViaPoints(moveToStartWaypoints(1,:), moveToStartWaypoints(2,:), occupancyGrid);
