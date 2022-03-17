@@ -136,3 +136,7 @@ for each adjacent position:
 
 
 
+NOTES:
+- For 
+cubePickPlace([225, 0, 50, -pi/2], [225, 0, 30, -pi/2], [225, 0, 50, -pi/2], true, port_num)
+cubePickPlace([225, 0, 50, 0], [225, 0, 20, 0], [225, 0, 50, 0], true, port_num)
