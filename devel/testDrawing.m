@@ -138,7 +138,7 @@ if initDynamixels(port_num, 'vel') == 0
     figure
     plotQuinticInterp(vias, coeffs, T);
 
-    mainServoLoop(coeffs, T, Tend, port_num, true, vias);
+    mainServoLoop2(coeffs, T, Tend, port_num, true, vias);
 
 end % End checking that dynamixels have set up correctly
 
@@ -161,3 +161,5 @@ fprintf('Port Closed \n');
 
 % Unload Library
 unloadlibrary(lib_name);
+
+
