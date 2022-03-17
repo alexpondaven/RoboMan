@@ -31,7 +31,7 @@ function status = initDynamixels(port_num, mode)
     %% Write to servos 1-4 (position control)
     for i=1:4
         % Disable Dynamixel torque to write settings to it
-        write1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_TORQUE_ENABLE, 0);
+        % write1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_TORQUE_ENABLE, 0);
 
         % Put actuator into Control Mode
         write1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_OPERATING_MODE, MODE(i));
