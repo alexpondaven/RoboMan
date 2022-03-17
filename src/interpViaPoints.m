@@ -29,8 +29,8 @@ function [coeff_paths, T_paths, Tend_paths] = interpViaPoints(via_paths, isPlot)
         end
 
         coeff_paths(end+1) = {coeffs};
-        T_paths(end+1) = T;
-        Tend_paths(end+1) = Tend;
+        T_paths(end+1) = {T};
+        Tend_paths(end+1) = {Tend};
     end
 
 end
