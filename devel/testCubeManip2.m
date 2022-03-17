@@ -98,7 +98,7 @@ if initDynamixels(port_num, 'vel') == 0
     % - Otherwise, just move path
 
     % Movement code
-    for i=1:size(path_isholdingcube,1)
+    for i=1:size(path_isholdingcube,2)
         if path_isholdingcube(i)
             path_waypoints = waypoints{i};
             startPos = path_waypoints(1,:);
