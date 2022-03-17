@@ -73,7 +73,7 @@ if initDynamixels(port_num, 'vel') == 0
     velocityLimit = getDXLSettings().velocityLimit;
 
     % Corners
-    z=90;
+    z=40;
     coords = [ 200 60  z
                200 140 z
                125 140 z
@@ -99,7 +99,7 @@ if initDynamixels(port_num, 'vel') == 0
      for j=1:size(corners, 1)
          % corners(j,:)
          %  theta = inverseKinDynamixel3(corners(j, 1), corners(j, 2), corners(j, 3), -pi/2,pi/4,GRIP_POS);
-         theta = inverseKinDynamixel(corners(j, 1), corners(j, 2), corners(j, 3), -pi/4, GRIP_POS);
+         theta = inverseKinDynamixel(corners(j, 1), corners(j, 2), corners(j, 3), 0, GRIP_POS);
          vias = [vias; theta(1:4)];
      end
 
@@ -112,7 +112,7 @@ if initDynamixels(port_num, 'vel') == 0
     mainServoLoop(coeffs, T, Tend, port_num, true, vias);
 
     %Parms of the circle
-    origin=[100,200,60];
+    origin=[200,100,40];
     radius=40;
     num_points=20;
 
@@ -128,7 +128,7 @@ if initDynamixels(port_num, 'vel') == 0
      %  calculate vias with adajustment to the gripper angle_thetaG  
      vias = curr_pos;
      for j=1:size(circle, 1)
-         theta = inverseKinDynamixel(circle(j, 1), circle(j, 2), circle(j, 3), -pi/4, GRIP_POS);
+         theta = inverseKinDynamixel(circle(j, 1), circle(j, 2), circle(j, 3), 0, GRIP_POS);
          vias = [vias; theta(1:4)];
      end
 
