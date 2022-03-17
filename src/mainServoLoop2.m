@@ -69,6 +69,7 @@ end
 
 start_time = now;
 curr_time = 0;
+prev_err = curr_err;
 
 % Store previous target segment
 last_seg = false;   % If we are homing on the last segment
@@ -94,7 +95,8 @@ while ~( last_seg && all( abs(curr_err) < 10 ) )
     end
 
     last_seg = targetIdx == size(T, 1);
-    [jointVel, err_acc] = feedforwardPIcontrol2(desiredVel, curr_err, err_acc);
+    [jointVel, err_acc] = feedforwardPIcontrol2(desiredVel, curr_err, prev_err, err_acc);
+    prev_err = curr_err;
 
     % Convert sampled joint velocity from ticks/s to rev/min. One unit = 0.229 RPM
     jointVel = round( (jointVel * 60 / 4096) / 0.229 );
