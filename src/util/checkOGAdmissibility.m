@@ -15,6 +15,6 @@ function admissible = checkOGAdmissibility(ogCoords)
     [~, ec] = inverseKin2(xVal, yVal, zVal, theta_g, false);
 
     admissible = ec==0;
-
+    IK_ErrorCodes(ec);
 end
 
