@@ -10,11 +10,11 @@ function theta_vias = calcViaPoints(start_waypoint, goal_waypoint, occupancyGrid
 % theta_vias : via points of servo1-4 angles
 
     waypoints = AstarSearch(start_waypoint, goal_waypoint, occupancyGrid );
-    theta_vias = zeros( size(waypoints, 1)+1, 4 );
+    theta_vias = zeros( size(waypoints, 1), 4 );
     for i=1:size(waypoints, 1)
         % Note: Gripper open/close not important here as only theta1..4 taken
         ikResult = inverseKinDynamixel2( waypoints(i,1), waypoints(i,2), waypoints(i,3), waypoints(i,4), true ); 
-        theta_vias(i+1, :) = ikResult(1:4);
+        theta_vias(i, :) = ikResult(1:4);
     end
 
 end

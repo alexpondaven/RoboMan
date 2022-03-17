@@ -25,12 +25,16 @@ function retCode = cubePickPlace(goalPos, cubePos, nextStartPos, pickOrPlace, po
     endGripperPos = ~pickOrPlace;
     params = getDXLParams();
 
+    disp("[cubePickPlace] asserting initial gripper pos");
+
     % assert that gripper is indeed in desired position
     if pickOrPlace == true 
         setGripperPos(true, port_num);  % open gripper
     else
         setGripperPos(false, port_num); % make sure grip is tight
     end
+
+    disp("[cubePickPlace] Moving from goalPos -> cubePos");
 
     %% Generate trajectory from goalPos -> cubePos
     viaCoords = linearInterpolate(goalPos, cubePos, numPoints);
@@ -59,7 +63,7 @@ function retCode = cubePickPlace(goalPos, cubePos, nextStartPos, pickOrPlace, po
         return;
     end
 
-
+    disp("[cubePickPlace] asserting second gripper pos");
 
     %% open/let go of gripper
     if pickOrPlace == true 
@@ -68,7 +72,7 @@ function retCode = cubePickPlace(goalPos, cubePos, nextStartPos, pickOrPlace, po
         setGripperPos(true, port_num);  % let cube go
     end
 
-
+    disp("[cubePickPlace] Moving from cubePos -> nextStartPos");
     
     %% Generate trajectory from cubePos -> nextStartPos
     viaCoords = linearInterpolate(cubePos, nextStartPos, numPoints);

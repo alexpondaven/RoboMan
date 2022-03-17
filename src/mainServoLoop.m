@@ -44,7 +44,11 @@ curr_time = 0;
 % Store previous target segment
 last_seg = false;   % If we are homing on the last segment
 
+retCode = 0;
+motor_err_flag = false;
+
 while ~( last_seg && all( abs(curr_err) < 10 ) )
+
     % TODO figure out what to do if control has not converged by the time ending
     if curr_time < Tend
         [desiredVel, targetIdx] = sampleQuinticVel(coeffs, T, curr_time);
@@ -55,13 +59,21 @@ while ~( last_seg && all( abs(curr_err) < 10 ) )
         desiredVel = zeros(1,4);
         targetIdx = size(T,1);
     end
-
+    
     last_seg = targetIdx == size(T, 1);
-
+    
     [jointVel, err_acc] = feedforwardPIcontrol(desiredVel, curr_err, err_acc);
-
+    
     % Convert sampled joint velocity from ticks/s to rev/min. One unit = 0.229 RPM
     jointVel = round( (jointVel * 60 / 4096) / 0.229 );
+
+    % Status print
+    fprintf("curr_pos: %04d | %04d | %04d | %04d\n", curr_pos(1), curr_pos(2), curr_pos(3), curr_pos(4));
+    fprintf("desiredPos: %.1f | %.1f | %.1f | %.1f\n", desiredPos(1), desiredPos(2), desiredPos(3), desiredPos(4));
+    fprintf("curr_err: %.1f | %.1f | %.1f | %.1f\n", curr_err(1), curr_err(2), curr_err(3), curr_err(4));
+    fprintf("curr_vel: %04d | %04d | %04d | %04d\n", curr_vel(1), curr_vel(2), curr_vel(3), curr_vel(4));
+    fprintf("desiredVel: %.1f | %.1f | %.1f | %.1f\n", desiredVel(1), desiredVel(2), desiredVel(3), desiredVel(4));
+    fprintf("jointVel: %04d | %04d | %04d | %04d\n\n", jointVel(1), jointVel(2), jointVel(3), jointVel(4));
     
     % startLoopTime = now;
 
@@ -79,7 +91,8 @@ while ~( last_seg && all( abs(curr_err) < 10 ) )
             write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(3), params.ADDR_PRO_GOAL_VELOCITY, 0);
             write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(4), params.ADDR_PRO_GOAL_VELOCITY, 0);
             
-            return % STOP EXECUTION
+            motor_err_flag = true;
+            break % STOP EXECUTION
         end
         
         curr_vel(i) = twos2decimal(read4ByteTxRx (port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_VELOCITY), 32 );
@@ -89,6 +102,10 @@ while ~( last_seg && all( abs(curr_err) < 10 ) )
     end
 
     % fprintf("Overall time for one loop: %0.4f\n", (now-startLoopTime) * 24*60*60);
+
+    if motor_err_flag
+        break
+    end
 
     curr_time = (now-start_time) * 24 * 60 * 60;
     curr_err = desiredPos - curr_pos; % Difference between sampled quintic position and measured position
@@ -108,7 +125,6 @@ write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(1), params.ADD
 write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(2), params.ADDR_PRO_GOAL_VELOCITY, 0);
 write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(3), params.ADDR_PRO_GOAL_VELOCITY, 0);
 write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(4), params.ADDR_PRO_GOAL_VELOCITY, 0);
-retCode = 0;
 
 % Plot histories for each joint
 if isPlot

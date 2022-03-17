@@ -68,8 +68,10 @@ if initDynamixels(port_num, 'vel') == 0
     for i=1:4
         curr_pos(i) = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_POSITION);
     end
+    fprintf("curr_pos: %04d | %04d | %04d | %04d\n", curr_pos(1), curr_pos(2), curr_pos(3), curr_pos(4));
     currEndpointCoords = getCurrEndpointCoords(curr_pos);
 
+    fprintf("currEndpointCoords: %04d | %04d | %04d | %04d\n", currEndpointCoords(1), currEndpointCoords(2), currEndpointCoords(3), currEndpointCoords(4));
     % SET CUBE MOVEMENTS
     % Format:  [src cube holder, dst cube holder, rotation]
     %           rotation:
@@ -105,26 +107,30 @@ if initDynamixels(port_num, 'vel') == 0
             % Grab cube
             "Grab cube"
             if cubePickPlace(startPos, startPos - GRAB_DEPTH, startPos, true, port_num) ~= 0
-
+                disp("Grab cube failed")
+                return
             end
             
             % Follow trajectory
             "Move cube"
-            if mainServoLoop(coeff_paths{i}, T_paths{i}, Tend_paths{i}, port_num, isPlot) ~= 0
-
+            if mainServoLoop(coeff_paths{i}, T_paths{i}, Tend_paths{i}, port_num, isPlot, cube_via_paths{i}) ~= 0
+                disp("Move cube failed")
+                return
             end
 
             % Drop cube
             "Drop cube"
             if cubePickPlace(endPos, endPos - GRAB_DEPTH, endPos, false, port_num) ~= 0
-            
+                disp("Drop cube failed")
+                return
             end
 
         else
             % Follow trajectory
-            "Move cube"
-            if mainServoLoop(coeff_paths{i}, T_paths{i}, Tend_paths{i}, port_num, isPlot) ~= 0
-
+            "Move arm"
+            if mainServoLoop(coeff_paths{i}, T_paths{i}, Tend_paths{i}, port_num, isPlot, cube_via_paths{i}) ~= 0
+                disp("Move arm failed")
+                return
             end
         end
     end

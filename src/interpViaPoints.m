@@ -13,14 +13,14 @@ function [coeff_paths, T_paths, Tend_paths] = interpViaPoints(via_paths, isPlot)
     coeff_paths = {};
     T_paths = {};
     Tend_paths = {};
-    for i=1:size(via_paths,1)
+    for i=1:size(via_paths,2)
         % Start with current position? - but we don't know current position after every segment
         % Assume at correct position at start of segment after mainServoLoop is run
         % vias(1,:) = curr_pos;
 
         % Interpolate between waypoints
         vias = via_paths{i};
-        [T, Tend] = assignViaTimes(vias, 'dvel');    % Tend no longer used
+        [T, Tend] = assignViaTimes(vias, 'lin');    % Tend no longer used
         coeffs = interpQuinticTraj(vias, T);
 
         if isPlot
