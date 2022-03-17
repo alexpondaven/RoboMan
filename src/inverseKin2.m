@@ -17,7 +17,9 @@ function [theta, ec] = inverseKin2(x,y,z,theta_G,gripOpen)
     L1 = armDims.L1;
     L2 = armDims.L2;
     L3 = armDims.L3;
-    L4 = armDims.L4;           % Alter this parameter for end effector grip position
+    % L4 = armDims.L4;
+    theta_go = armDims.theta_go;           % Alter this parameter for end effector grip position
+    d_go = armDims.d_go;
     alpha_3 = armDims.alpha_3;
     R_3 = armDims.R_3;
 
@@ -30,12 +32,19 @@ function [theta, ec] = inverseKin2(x,y,z,theta_G,gripOpen)
     theta(1) = atan2(y,x);          % hip angle
 
     % Input G1 (end effector position)
-    g1_x = sqrt(x^2+y^2);           % goal pos in 2d side view
+    g1_x = hypot(x, y);           % goal pos in 2d side view
     g1_y = z - 77;
 
+    % Calculate offset
+    theta_go = theta_G - theta_go;
+    delta_y = d_go * sin(theta_go);
+    delta_x = d_go * cos(theta_go);
+    
     % Calculating G2 (wrist joint position)
-    x_ = g1_x - L4*cos(theta_G);
-    y_ = g1_y - L4*sin(theta_G);
+    x_ = g1_x - delta_x;
+    y_ = g1_y - delta_y;
+    % x_ = g1_x - L4*cos(theta_G)
+    % y_ = g1_y - L4*sin(theta_G)
     
     % sin(theta3) + alpha
     s3_a = (x_^2 + y_^2 - L3^2 - L2^2 - L1^2)/(2*L3*R_3);

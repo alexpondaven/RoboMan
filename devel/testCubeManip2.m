@@ -82,7 +82,7 @@ if initDynamixels(port_num, 'vel') == 0
     %   Cube states defines state of cubes (just for us to write state down easily): 
     %               [cubeholder, height, red face location]
     %                e.g. {[1,1,"up"],[2,1,"back"]} describes cube on holder1 facing up and cube on holder2 facing back (towards robot)
-    cubeMoves = [2,2,1];
+    cubeMoves = [3,3,1];
     cubeStacks = [0,1,0,0,0,0];
     
     % Get vias for cube movement
