@@ -22,6 +22,7 @@ function occupancyGrid = createOccupancyGrid(cubeStack)
     Y_LIST = ogParams.Y_LIST;
     CUBE_DIM = ogParams.CUBE_DIM;
     HOLDER_HEIGHT = ogParams.HOLDER_HEIGHT;
+    HOLDER_OCCUPANCY_GRID_Z = ogParams.HOLDER_OCCUPANCY_GRID_Z;
     HOLDER_DIM = ogParams.HOLDER_DIM;
 
     occupancyGrid = zeros( ...
@@ -55,7 +56,7 @@ function occupancyGrid = createOccupancyGrid(cubeStack)
                         holder_theta1_lb = holder_theta1 - holder_theta_bound;
     
                         if ((holder_xPrime+HOLDER_DIM/2 >= x) && (holder_xPrime-HOLDER_DIM/2 <= x)) && ...
-                           ((y >= 0) && (y <= HOLDER_HEIGHT)) && ...
+                           ((y >= 0) && (y <= HOLDER_OCCUPANCY_GRID_Z)) && ...
                            ((holder_theta1_ub >= theta_1)   && (holder_theta1_lb <= theta_1)  )
     
                             % fprintf("holder ub: %0.2f | lb: %0.2f\n", rad2deg(holder_theta1_ub), rad2deg(holder_theta1_lb));
