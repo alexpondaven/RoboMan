@@ -116,7 +116,7 @@ if initDynamixels(port_num, 'vel') == 0
     radius=40;
     num_points=20;
 
-    circle=semicircle(origin,radius,num_points);
+    circle=semicircle2(origin,radius,num_points);
 
 
     curr_pos = zeros(1,4);
