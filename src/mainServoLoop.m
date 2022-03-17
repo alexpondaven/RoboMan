@@ -104,6 +104,7 @@ while ~( last_seg && all( abs(curr_err) < 10 ) )
     % fprintf("Overall time for one loop: %0.4f\n", (now-startLoopTime) * 24*60*60);
 
     if motor_err_flag
+        disp("Breaking main for loop.");
         break
     end
 

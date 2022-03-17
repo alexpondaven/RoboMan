@@ -77,10 +77,10 @@ retCode = 0;
 
 while ~( last_seg && all( abs(curr_err) < 10 ) )
 
-    % for testing
-    if (now-start_time)*24*60*60 > 10
-        break
-    end
+    % % for testing
+    % if (now-start_time)*24*60*60 > 20
+    %     break
+    % end
 
     % TODO figure out what to do if control has not converged by the time ending
     if curr_time < Tend
@@ -94,7 +94,7 @@ while ~( last_seg && all( abs(curr_err) < 10 ) )
     end
 
     last_seg = targetIdx == size(T, 1);
-    [jointVel, err_acc] = feedforwardPIcontrol(desiredVel, curr_err, err_acc);
+    [jointVel, err_acc] = feedforwardPIcontrol2(desiredVel, curr_err, err_acc);
 
     % Convert sampled joint velocity from ticks/s to rev/min. One unit = 0.229 RPM
     jointVel = round( (jointVel * 60 / 4096) / 0.229 );
@@ -153,6 +153,7 @@ while ~( last_seg && all( abs(curr_err) < 10 ) )
     end
 
     if retCode ~= 0
+        disp("Breaking main for loop.");
         break;  % safety
     end
 
