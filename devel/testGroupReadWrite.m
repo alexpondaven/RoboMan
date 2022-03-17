@@ -90,17 +90,18 @@ if initDynamixels(port_num, 'vel') == 0
     % Simple moving in a square as usual
     z = 100;
     square = [
-        175 -50 z;
-        175  50 z;
-        75  50  z;
-        75 -50  z; 
+        175  100 z;
+        175 -100 z;
+        175  100 z;
+        % 75  50  z;
+        % 75 -50  z; 
     ];
-    square(end+1,:) = square(1,:);  % make it complete the square
+    % square(end+1,:) = square(1,:);  % make it complete the square
 
     % interpolate lines between corners
     corners = [];
-    numPoints = 10;
-    for i=2:length(square)
+    numPoints = 40;
+    for i=2:size(square, 1)
         corners = [corners; linearInterpolate(square(i-1,:), square(i,:), numPoints) ];
     end
     
@@ -112,7 +113,7 @@ if initDynamixels(port_num, 'vel') == 0
     end
 
     % Interpolate and assign timings
-    [T, Tend] = assignViaTimes(vias, 'dvel');
+    [T, Tend] = assignViaTimes(vias, 'lin');
     coeffs = interpQuinticTraj(vias, T);
     figure
     plotQuinticInterp(vias, coeffs, T);

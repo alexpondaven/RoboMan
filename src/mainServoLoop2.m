@@ -76,10 +76,10 @@ last_seg = false;   % If we are homing on the last segment
 
 retCode = 0;
 
-while ~( last_seg && all( abs(curr_err) < 10 ) )
-
-    % % for testing
-    % if (now-start_time)*24*60*60 > 20
+while ~( last_seg && all( abs(curr_err) < 2 ) )
+% % for testing
+% while 1
+    % if (now-start_time)*24*60*60 > 6
     %     break
     % end
 
@@ -199,6 +199,7 @@ if isPlot
         subplot(4,3, 3*(joint-1)+1)
         plot(time_vec, err_vec(:,joint))
         title("Error history - Joint " + joint)
+        ylim([-45 45])
         grid on
 
         subplot(4,3, 3*(joint-1)+2)
