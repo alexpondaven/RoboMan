@@ -19,15 +19,22 @@ function [coeff_paths, T_paths, Tend_paths] = interpViaPoints(via_paths, isPlot)
         % vias(1,:) = curr_pos;
 
         % Interpolate between waypoints
-        vias = via_paths{i};
-        [T, Tend] = assignViaTimes(vias, 'lin');    % Tend no longer used
-        coeffs = interpQuinticTraj(vias, T);
-
-        if isPlot
-            figure
-            plotQuinticInterp(vias, coeffs, T);
+        vias = via_paths{i}
+        
+        if size(vias,1)==0
+            coeffs = [];
+            T = [];
+            Tend = 0;
+        else
+            [T, Tend] = assignViaTimes(vias, 'lin');    % Tend no longer used
+            coeffs = interpQuinticTraj(vias, T);
+            
+            if isPlot
+                figure
+                plotQuinticInterp(vias, coeffs, T);
+            end
         end
-
+            
         coeff_paths(end+1) = {coeffs};
         T_paths(end+1) = {T};
         Tend_paths(end+1) = {Tend};
