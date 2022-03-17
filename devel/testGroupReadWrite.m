@@ -20,7 +20,8 @@ end
 
 % Load Libraries
 if ~libisloaded(lib_name)
-    [notfound, warnings] = loadlibrary(lib_name, 'dynamixel_sdk.h', 'addheader', 'port_handler.h', 'addheader', 'packet_handler.h');
+    [notfound, warnings] = loadlibrary(lib_name, 'dynamixel_sdk.h', 'addheader', 'port_handler.h', 'addheader', 'packet_handler.h', ...
+    'addheader', 'group_sync_write.h', 'addheader', 'group_sync_read.h', 'addheader', 'group_bulk_read.h', 'addheader', 'group_bulk_write.h');
 end
 
 params = getDXLParams();
@@ -55,6 +56,7 @@ end
 if initDynamixels(port_num, 'vel') == 0
 
     % Set up. We should remove this and put this into its own function later.
+    COMM_SUCCESS = 0;
     groupBulkReadNum = groupBulkRead(port_num, params.PROTOCOL_VERSION);
     groupBulkReadAddParam(groupBulkReadNum, params.DXL_LIST(1), params.ADDR_PRO_PRESENT_POSITION, 4);
     groupBulkReadAddParam(groupBulkReadNum, params.DXL_LIST(2), params.ADDR_PRO_PRESENT_POSITION, 4);
@@ -69,8 +71,9 @@ if initDynamixels(port_num, 'vel') == 0
     % Read present position and velocity
     groupBulkReadTxRxPacket(groupBulkReadNum);
     % Check for errors
-    if getLastTxRxResult(port_num, PROTOCOL_VERSION) ~= COMM_SUCCESS
-        printTxRxResult(params.PROTOCOL_VERSION, getLastTxRxResult(port_num, params.PROTOCOL_VERSION));
+    if getLastTxRxResult(port_num, params.PROTOCOL_VERSION) ~= COMM_SUCCESS
+        % printTxRxResult(params.PROTOCOL_VERSION, getLastTxRxResult(port_num, params.PROTOCOL_VERSION));
+        disp("Error in bulk read");
     end
 
     curr_pos = zeros(1,4);
@@ -85,7 +88,7 @@ if initDynamixels(port_num, 'vel') == 0
     currEndpointCoords = getCurrEndpointCoords(curr_pos);
 
     % Simple moving in a square as usual
-    z = 90;
+    z = 100;
     square = [
         175 -50 z;
         175  50 z;
@@ -102,9 +105,9 @@ if initDynamixels(port_num, 'vel') == 0
     end
     
     % do inverse kinematics
-    vias = zeros(size(corners));
-    for i=1, length(corners)
-        theta = inverseKinDynamixel2(corners(i,1), corners(i,2), corners(i,3), corners(i,4), true);
+    vias = zeros(length(corners), 4);
+    for i=1:length(corners)
+        theta = inverseKinDynamixel2(corners(i,1), corners(i,2), corners(i,3), -pi/2, true);
         vias(i,:) = theta(1:4);
     end
 

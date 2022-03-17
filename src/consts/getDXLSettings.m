@@ -2,7 +2,7 @@ function dxlSettings = getDXLSettings()
 
     %% Dynamixel parameters
     dxlSettings.servoLimits = getServoLimits();    
-    dxlSettings.velocityLimit = 40;
+    dxlSettings.velocityLimit = 10;
     dxlSettings.DYN_VEL_P = 150;
     dxlSettings.DYN_VEL_I = 900;
 

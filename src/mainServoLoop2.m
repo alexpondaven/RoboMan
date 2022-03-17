@@ -18,19 +18,32 @@ function retCode = mainServoLoop2(coeffs, T, Tend, port_num, isPlot, vias)
 
 params = getDXLParams();
 servoLimits = getServoLimits();
+velocityLimit = getDXLSettings().velocityLimit;
 COMM_SUCCESS = 0;
 
-groupReadNum = groupBulkRead(port_num, params.PROTOCOL_VERSION);
+groupReadVelNum = groupSyncRead(port_num, params.PROTOCOL_VERSION, params.ADDR_PRO_PRESENT_VELOCITY, 4);
+groupReadPosNum = groupSyncRead(port_num, params.PROTOCOL_VERSION, params.ADDR_PRO_PRESENT_POSITION, 4);
 groupWriteNum = groupSyncWrite(port_num, params.PROTOCOL_VERSION, params.ADDR_PRO_GOAL_VELOCITY, 4);
 for i=1:4
-    groupBulkReadAddParam(groupReadNum, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_POSITION, 4);
-    groupBulkReadAddParam(groupReadNum, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_VELOCITY, 4);
+    if ~groupSyncReadAddParam(groupReadVelNum, params.DXL_LIST(i))
+        fprintf("Sync read registration for curr_vel(%d) failed\n", i);
+        return
+    end
+
+    if ~groupSyncReadAddParam(groupReadPosNum, params.DXL_LIST(i))
+        fprintf("Sync read registration for curr_pos(%d) failed\n", i);
+        return
+    end
 end
 
-groupBulkReadTxRxPacket(groupBulkReadNum);
 % Check for errors
-if getLastTxRxResult(port_num, PROTOCOL_VERSION) ~= COMM_SUCCESS
-    printTxRxResult(params.PROTOCOL_VERSION, getLastTxRxResult(port_num, params.PROTOCOL_VERSION));
+groupSyncReadTxRxPacket(groupReadPosNum);
+if getLastTxRxResult(port_num, params.PROTOCOL_VERSION) ~= COMM_SUCCESS
+    disp("Error in position read");
+end
+groupSyncReadTxRxPacket(groupReadVelNum);
+if getLastTxRxResult(port_num, params.PROTOCOL_VERSION) ~= COMM_SUCCESS
+    disp("Error in position read");
 end
 
 % Initialise some variables
@@ -39,8 +52,8 @@ curr_vel = zeros(1,4);
 
 % Readout values
 for i=1:4
-    curr_pos(i) = groupBulkReadGetData(groupBulkReadNum, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_POSITION, 4);
-    curr_vel(i) = twos2decimal(groupBulkReadGetData(groupBulkReadNum, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_VELOCITY, 4), 32);
+    curr_pos(i) = groupSyncReadGetData(groupReadPosNum, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_POSITION, 4);
+    curr_vel(i) = twos2decimal(groupSyncReadGetData(groupReadVelNum, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_VELOCITY, 4), 32);
 end
 curr_err = sampleQuintic(coeffs, T, 0) - curr_pos;    % difference from desired start point at T=0 and current point
 err_acc = curr_err;
@@ -60,7 +73,15 @@ curr_time = 0;
 % Store previous target segment
 last_seg = false;   % If we are homing on the last segment
 
+retCode = 0;
+
 while ~( last_seg && all( abs(curr_err) < 10 ) )
+
+    % for testing
+    if (now-start_time)*24*60*60 > 10
+        break
+    end
+
     % TODO figure out what to do if control has not converged by the time ending
     if curr_time < Tend
         [desiredVel, targetIdx] = sampleQuinticVel(coeffs, T, curr_time);
@@ -77,40 +98,67 @@ while ~( last_seg && all( abs(curr_err) < 10 ) )
 
     % Convert sampled joint velocity from ticks/s to rev/min. One unit = 0.229 RPM
     jointVel = round( (jointVel * 60 / 4096) / 0.229 );
+    desiredVelScaled = round( (desiredVel * 60 / 4096) / 0.229 );
+
+    % clamp jointVel
+    jointVel = min(jointVel,velocityLimit);
+    jointVel = max(jointVel,-velocityLimit);
     
+    % fprintf("curr_pos: %04d | %04d | %04d | %04d\n", curr_pos(1), curr_pos(2), curr_pos(3), curr_pos(4));
+    % fprintf("desiredPos: %.1f | %.1f | %.1f | %.1f\n", desiredPos(1), desiredPos(2), desiredPos(3), desiredPos(4));
+    % fprintf("curr_err: %.1f | %.1f | %.1f | %.1f\n", curr_err(1), curr_err(2), curr_err(3), curr_err(4));
+    % fprintf("curr_vel: %04d | %04d | %04d | %04d\n", curr_vel(1), curr_vel(2), curr_vel(3), curr_vel(4));
+    % fprintf("desiredVel: %.1f | %.1f | %.1f | %.1f\n", desiredVelScaled(1), desiredVelScaled(2), desiredVelScaled(3), desiredVelScaled(4));
+    % fprintf("jointVel: %04d | %04d | %04d | %04d\n\n", jointVel(1), jointVel(2), jointVel(3), jointVel(4));
     % startLoopTime = now;
 
     % Read motor values
-    groupBulkReadTxRxPacket(groupBulkReadNum);
+    groupSyncReadTxRxPacket(groupReadPosNum);
     % Check for errors
-    if getLastTxRxResult(port_num, PROTOCOL_VERSION) ~= COMM_SUCCESS
-        printTxRxResult(params.PROTOCOL_VERSION, getLastTxRxResult(port_num, params.PROTOCOL_VERSION));
+    if getLastTxRxResult(port_num, params.PROTOCOL_VERSION) ~= COMM_SUCCESS
+        disp("Error in position read");
+    end
+    groupSyncReadTxRxPacket(groupReadVelNum);
+    % Check for errors
+    if getLastTxRxResult(port_num, params.PROTOCOL_VERSION) ~= COMM_SUCCESS
+        disp("Error in position read");
     end
     % Read and write values
     for i=1:4
-        curr_pos(i) = groupBulkReadGetData(groupBulkReadNum, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_POSITION, 4);
-        curr_vel(i) = twos2decimal(groupBulkReadGetData(groupBulkReadNum, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_VELOCITY, 4), 32);
+        if groupSyncReadIsAvailable(groupReadPosNum, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_POSITION, 4)
+            curr_pos(i) = groupSyncReadGetData(groupReadPosNum, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_POSITION, 4);
+        else
+            fprintf("curr_pos(%d) not avail\n", i);
+        end
+
+        if groupSyncReadIsAvailable(groupReadVelNum, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_VELOCITY, 4)
+            curr_vel(i) = twos2decimal(groupSyncReadGetData(groupReadVelNum, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_VELOCITY, 4), 32);
+        else
+            fprintf("curr_vel(%d) not avail\n", i);
+        end
     
         if curr_pos(i) > servoLimits(i,2) || curr_pos(i) < servoLimits(i,1)
             fprintf("VIOLATED JOINT LIMITS ON SERVO %d! EXITING\n", i);
     
             retCode = -1;
             for motor_idx=1:4
-                groupSyncWriteAddParam( groupWriteNum, params.DXL_LIST(i), params.ADDR_PRO_GOAL_VELOCITY, 0 );
+                groupSyncWriteAddParam( groupWriteNum, params.DXL_LIST(i), 0, 4 );
             end
             groupSyncWriteTxPacket(groupWriteNum);
             groupSyncWriteClearParam(groupWriteNum);
             
-            return % STOP EXECUTION
+            break % STOP EXECUTION
         end
-        
-        groupSyncWriteAddParam( groupWriteNum, params.DXL_LIST(i), params.ADDR_PRO_GOAL_VELOCITY, typecast(int32(jointVel(i)), 'uint32') );
+        groupSyncWriteAddParam( groupWriteNum, params.DXL_LIST(i), typecast(int32(jointVel(i)), 'uint32'), 4 );
     end
 
-    % Write to motors. They will clamp to velocity limits automatically.
+    if retCode ~= 0
+        break;  % safety
+    end
+
     groupSyncWriteTxPacket(groupWriteNum);
     if getLastTxRxResult(port_num, params.PROTOCOL_VERSION) ~= COMM_SUCCESS
-        printTxRxResult(params.PROTOCOL_VERSION, getLastTxRxResult(port_num, params.PROTOCOL_VERSION));
+        disp("Error in sync write to servos");
     end
     % Clear syncwrite parameter storage
     groupSyncWriteClearParam(groupWriteNum);
@@ -124,20 +172,22 @@ while ~( last_seg && all( abs(curr_err) < 10 ) )
         err_vec(end+1,:) = curr_err;
         vel_vec(end+1,:) = curr_vel;
         command_vel_vec(end+1,:) = jointVel;
-        desired_vel_vec(end+1,:) = round( (desiredVel * 60 / 4096) / 0.229 );
+        desired_vel_vec(end+1,:) = desiredVelScaled;
         pos_vec(end+1,:) = curr_pos;
         time_vec(end+1) = curr_time;
     end
 end
 
 % Ensure that final speed is always 0
-for motor_idx=1:4
-    groupSyncWriteAddParam( groupWriteNum, params.DXL_LIST(i), params.ADDR_PRO_GOAL_VELOCITY, 0 );
-end
-groupSyncWriteTxPacket(groupWriteNum);
-groupSyncWriteClearParam(groupWriteNum);
-
-retCode = 0;
+% for motor_idx=1:4
+%     groupSyncWriteAddParam( groupWriteNum, params.DXL_LIST(i), 0, 4 );
+% end
+% groupSyncWriteTxPacket(groupWriteNum);
+% groupSyncWriteClearParam(groupWriteNum);
+write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(1), params.ADDR_PRO_GOAL_VELOCITY, 0);
+write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(2), params.ADDR_PRO_GOAL_VELOCITY, 0);
+write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(3), params.ADDR_PRO_GOAL_VELOCITY, 0);
+write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(4), params.ADDR_PRO_GOAL_VELOCITY, 0);
 
 % Plot histories for each joint
 if isPlot
