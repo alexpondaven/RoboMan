@@ -57,7 +57,7 @@ function retCode = cubePickPlace(goalPos, cubePos, nextStartPos, pickOrPlace, po
     coeffs = interpQuinticTraj(viaAngles, T);
     Tend
     % [coeffs, T, Tend] = interpViaPoints(viaAngles, true);
-    if mainServoLoop(coeffs, T, Tend, port_num, true, viaAngles) ~= 0
+    if mainServoLoop2(coeffs, T, Tend, port_num, true, viaAngles) ~= 0
         disp("Error in [cubePickPlace] goalPos -> cubePos");
         retCode = -1;
         return;
@@ -95,7 +95,7 @@ function retCode = cubePickPlace(goalPos, cubePos, nextStartPos, pickOrPlace, po
     coeffs = interpQuinticTraj(viaAngles, T);
     Tend
     % [coeffs, T, Tend] = interpViaPoints(viaAngles, true);
-    if mainServoLoop(coeffs, T, Tend, port_num, true, viaAngles) ~= 0
+    if mainServoLoop2(coeffs, T, Tend, port_num, true, viaAngles) ~= 0
         disp("Error in [cubePickPlace] cubePos -> nextStartPos");
         retCode = -1;
         return;
