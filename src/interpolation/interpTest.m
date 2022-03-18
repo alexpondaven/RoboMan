@@ -81,4 +81,4 @@ vias = {[0 0 0 0
         8 2 4 6]};
 Tend =15;
 
-interpViaPoints
+interpViaPoints(vias,true)

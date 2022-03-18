@@ -28,10 +28,12 @@ function [coeff_paths, T_paths, Tend_paths] = interpViaPoints(via_paths, isPlot)
         else
             [T, Tend] = assignViaTimes(vias, 'lin');    % Tend no longer used
             coeffs = interpQuinticTraj(vias, T);
+%             coeffs = interpCubicTraj(vias, T);
             
             if isPlot
                 figure
                 plotQuinticInterp(vias, coeffs, T);
+%                 plotCubicInterp(vias, coeffs, T);
             end
         end
             

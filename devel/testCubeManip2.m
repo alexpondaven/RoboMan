@@ -82,6 +82,30 @@ if initDynamixels(port_num, 'vel') == 0
     %   Cube states defines state of cubes (just for us to write state down easily): 
     %               [cubeholder, height, red face location]
     %                e.g. {[1,1,"up"],[2,1,"back"]} describes cube on holder1 facing up and cube on holder2 facing back (towards robot)
+
+    % Video setup: {[1,1,"away"],[2,1,"down"],[3,1,"away"]}
+    % Task 2a Translation - from start to arbitrary finish location
+    cubeMoves = [[1,4,0]
+                 [2,5,0]
+                 [3,6,0]];
+    cubeStacks = [1,1,1,0,0,0];
+
+
+    % Task 2b Rotation inplace - so red face is at top
+    cubeMoves = [[1,1,-1]
+                 [2,2,1]
+                 [2,2,1]
+                 [3,3,-1]];
+    cubeStacks = [1,1,1,0,0,0];
+
+    % Task 3b Stacking - stack in any finishing location (4?), with all red
+    % faces facing away
+    cubeMoves = [[1,4,0]
+                 [2,4,1]
+                 [3,4,0]];
+    cubeStacks = [1,1,1,0,0,0];
+    
+    % Test movements
     cubeMoves = [3,3,1];
     cubeStacks = [0,1,0,0,0,0];
     
