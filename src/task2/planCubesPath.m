@@ -58,7 +58,12 @@ for i=1:size(cubeMoves,1)
 
     % Get height above cubes
     src_z = HEIGHT_OFFSET + srcHeight * CUBE_SIZE;
-    dst_z = HEIGHT_OFFSET + dstHeight * CUBE_SIZE;
+    if srcPos == dstPos
+        dst_z = HEIGHT_OFFSET + dstHeight * CUBE_SIZE;
+    else
+        % Depositing one higher than current height
+        dst_z = HEIGHT_OFFSET + (dstHeight +1) * CUBE_SIZE;
+    end
 
     
 
@@ -82,6 +87,9 @@ for i=1:size(cubeMoves,1)
     % TODO: Experiment if we need to add offset to z depending on orientation grabbed?
     if src_thetaG == -pi/2
         src_z = src_z + TOPGRAB_OFFSET;
+    end
+    if dst_thetaG == -pi/2
+        dst_z = dst_z + TOPGRAB_OFFSET;
     end
 
     % Generate occupancy grid
