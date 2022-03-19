@@ -75,8 +75,9 @@ if initDynamixels(port_num, 'vel') == 0
 
     setGripperPos(false, port_num);
 
+    % Z-axis offset
+    z = 47;
     % Corners
-    z=47;
     coords = [ 200 60  z
                200 140 z
                125 140 z
