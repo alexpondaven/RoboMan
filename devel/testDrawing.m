@@ -20,7 +20,8 @@ end
 
 % Load Libraries
 if ~libisloaded(lib_name)
-    [notfound, warnings] = loadlibrary(lib_name, 'dynamixel_sdk.h', 'addheader', 'port_handler.h', 'addheader', 'packet_handler.h');
+  [notfound, warnings] = loadlibrary(lib_name, 'dynamixel_sdk.h', 'addheader', 'port_handler.h', 'addheader', 'packet_handler.h', ...
+  'addheader', 'group_sync_write.h', 'addheader', 'group_sync_read.h', 'addheader', 'group_bulk_read.h', 'addheader', 'group_bulk_write.h');
 end
 
 params = getDXLParams();
@@ -72,8 +73,10 @@ if initDynamixels(port_num, 'vel') == 0
     servoLimits = getServoLimits();
     velocityLimit = getDXLSettings().velocityLimit;
 
+    setGripperPos(false, port_num);
+
     % Corners
-    z=40;
+    z=47;
     coords = [ 200 60  z
                200 140 z
                125 140 z
@@ -86,7 +89,7 @@ if initDynamixels(port_num, 'vel') == 0
         corners = [corners; linearInterpolate(coords(i-1,:), coords(i,:), numPoints) ];
      end
 
-     GRIP_POS = deg2rad(232);
+     GRIP_POS = deg2rad(300);
 
      curr_pos = zeros(1,4);
      for i=1:4
@@ -109,10 +112,10 @@ if initDynamixels(port_num, 'vel') == 0
     figure
     plotQuinticInterp(vias, coeffs, T);
 
-    mainServoLoop(coeffs, T, Tend, port_num, true, vias);
+    mainServoLoop2(coeffs, T, Tend, port_num, true, vias);
 
     %Parms of the circle
-    origin=[200,100,40];
+    origin=[200,100,z];
     radius=40;
     num_points=20;
 
