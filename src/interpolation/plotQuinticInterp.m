@@ -6,8 +6,8 @@ function plotQuinticInterp(vias, coeffs, T)
 % vias      : Theta values of via points
 % coeffs    : Coefficients of cubic for each theta and segment
 % T         : Time value for each via point
-clf
-close
+% clf
+% close
 dT = diff(T);
 k = size(dT,2);
 for joint=1:4
