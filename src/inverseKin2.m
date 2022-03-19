@@ -100,17 +100,16 @@ function [theta, ec] = inverseKin2(x,y,z,theta_G,gripOpen)
 %     jointLimitErr = zeros(5, 'uint8');
     % one-hot vector to keep track of out-of-bound joints
     for idx=1:5
-        lb = jointBounds(1,idx);
+        lb = jointBounds(1, idx);
         ub = jointBounds(2, idx);
         if  (theta(idx) > ub)
-%             jointLimitErr(idx) = 1;
-            % fprintf("Theta %d angle %0.2f exceeds upper bound. UB: %0.2f\n", idx, rad2deg(theta(idx)), rad2deg(ub));
+            fprintf("Theta %d angle %0.2f exceeds upper bound. UB: %0.2f\n", idx, rad2deg(theta(idx)), rad2deg(ub));
             theta(idx) = ub;
             ec = -3;
             return
         end
         if (theta(idx) < lb)
-            % fprintf("Theta %d angle %0.2f exceeds lower bound. LB: %0.2f\n", idx, rad2deg(theta(idx)), rad2deg(lb));
+            fprintf("Theta %d angle %0.2f exceeds lower bound. LB: %0.2f\n", idx, rad2deg(theta(idx)), rad2deg(lb));
             theta(idx) = lb;
             ec = -3;
             return
