@@ -24,6 +24,7 @@ function retCode = cubePickPlace(goalPos, cubePos, nextStartPos, pickOrPlace, po
     startGripperPos = pickOrPlace;
     endGripperPos = ~pickOrPlace;
     params = getDXLParams();
+    viaTimeInterpMethod = params.viaTimeInterpMethod;
 
     disp("[cubePickPlace] asserting initial gripper pos");
 
@@ -53,9 +54,8 @@ function retCode = cubePickPlace(goalPos, cubePos, nextStartPos, pickOrPlace, po
     viaAngles = [curr_pos; viaAngles];
 
     % We use the primitive function because we will only have 1 via to pass through
-    [T, Tend] = assignViaTimes(viaAngles, 'acc');
+    [T, Tend] = assignViaTimes(viaAngles, viaTimeInterpMethod);
     coeffs = interpQuinticTraj(viaAngles, T);
-    Tend
     % [coeffs, T, Tend] = interpViaPoints(viaAngles, true);
     if mainServoLoop2(coeffs, T, Tend, port_num, true, viaAngles) ~= 0
         disp("Error in [cubePickPlace] goalPos -> cubePos");
@@ -91,9 +91,8 @@ function retCode = cubePickPlace(goalPos, cubePos, nextStartPos, pickOrPlace, po
     viaAngles = [curr_pos; viaAngles];
     
     % We use the primitive function because we will only have 1 via to pass through
-    [T, Tend] = assignViaTimes(viaAngles, 'dvel');
+    [T, Tend] = assignViaTimes(viaAngles, viaTimeInterpMethod);
     coeffs = interpQuinticTraj(viaAngles, T);
-    Tend
     % [coeffs, T, Tend] = interpViaPoints(viaAngles, true);
     if mainServoLoop2(coeffs, T, Tend, port_num, true, viaAngles) ~= 0
         disp("Error in [cubePickPlace] cubePos -> nextStartPos");

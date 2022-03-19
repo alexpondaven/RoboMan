@@ -49,4 +49,7 @@ function params = getDXLParams()
     params.MIN_POS = 600;
     % ---------------------------------- %%
 
+    % for assignViaTimes strategy
+    params.viaTimeInterpMethod = 'acc';
+
 end
