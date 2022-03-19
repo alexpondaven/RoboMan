@@ -29,7 +29,7 @@ THETA_1_LIST = getOccupancyGridParams().THETA_1_LIST;
 ARM_END = getArmDimensions().L4;
 
 t1 = now;
-og = createOccupancyGrid(cube_locs, cube_hold);
+og = createOccupancyGrid([1,1,1,0,0,0]);
 t2 = now;
 t_og = ((t2-t1)*24)*3600;
 
@@ -37,8 +37,11 @@ disp('Created occupancy grid.')
 
 % TODO fix bugs in reachability analysis!!!
 
-startPos = [ 145, 50, 75, 0 ];
-endPos =   [ 145, 50, 45, -pi/2 ];
+startPos = [ 75, -200, 50, 0 ];
+endPos =   [ 125, -125, 50, -pi/2 ];
+
+% startPos = [ 145, 50, 75, 0 ];
+% endPos =   [ 145, 50, 45, -pi/2 ];
 
 t1 = now;
 waypoints = AstarSearch( startPos, endPos, og );
