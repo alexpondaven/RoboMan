@@ -53,8 +53,8 @@ for joint=1:4
     title("Theta " + joint + " acceleration")
     grid on
 
-    [max_accel, max_accel_idx] = max(abs(a_interp));
-    fprintf("Peak acceleration: %0.2f @ %0.2fs\n", max_accel, t(max_accel_idx));
+    % [max_accel, max_accel_idx] = max(abs(a_interp));
+    % fprintf("Peak acceleration: %0.2f @ %0.2fs\n", max_accel, t(max_accel_idx));
     
     % hold on
     % plot(t,interp,'k')
