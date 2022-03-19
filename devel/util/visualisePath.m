@@ -7,8 +7,8 @@ function visualisePath(waypoints, path)
 % 
 % Does not return anything.
 
-    REPEAT_TIMES = 3;
-    PAUSE_DURATION = 0.4;
+    REPEAT_TIMES = 2;
+    PAUSE_DURATION = 0.3;
 
     % Repeat animation 5x
     for REPEAT=1:REPEAT_TIMES

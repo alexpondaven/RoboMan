@@ -152,18 +152,43 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
                                 end
                                 % Convert grid coordinates found in goal to cartesian coordinates
                                 waypoints = zeros(size(waypointIdx,2), 4);
-
-                                t_g_vect = linearInterpolate(endPos(4), startPos(4), size(waypointIdx,1))
+                                t_g_vect = linearInterpolate(endPos(4), startPos(4), size(waypointIdx,1));
 
                                 for idx=1:size(waypointIdx,1)
                                     waypoints(idx,:) = OGToCartesianCoords([1 waypointIdx(idx,:)]);
                                     waypoints(idx,4) = t_g_vect(idx);
                                 end
-                                
-                                fprintf('[A*] Goal has %d elements.\n\n', size(waypoints, 1))
-
                                 % invert waypoint list (to be in order)
                                 waypoints = flip(waypoints, 1);
+                                fprintf('[A*] Goal bef t_g augmentation has %d elements.\n', size(waypoints, 1))
+
+                                % We get a 'complete' set of waypoints here, now we need to interpolate for theta_g
+                                % [x,y,z,thetag] rows
+                                theta_g_diff = diff(waypoints(:,4))';    % convert into a row vector
+                                diff_idxs = find(theta_g_diff)  % Indices of waypoints where there was a change in theta_g
+                                interp_waypoints = [];
+                                
+                                for idx=1:size(waypoints,1)
+                                    % fprintf("curr_idx = %d ", idx);
+                                    if any(idx==diff_idxs)
+                                        interp_start = waypoints(idx, :);
+                                        interp_end = waypoints(idx+1, :);
+                                        NUM_INTERPOLATE = ceil( abs(theta_g_diff(idx)) / (pi/2) * 15) + 1;
+                                        % fprintf("with NUM_INTERPOLATE = %d\n", NUM_INTERPOLATE);
+                                        % a rotation of 90 degrees should give us 15 intermediate waypts (arbitrarily)
+                                        % +1 to at least have 2 waypoints
+                                        interpolated_waypoints = linearInterpolate(interp_start, interp_end, NUM_INTERPOLATE);
+                                        interp_waypoints = [interp_waypoints;
+                                                            interpolated_waypoints(1:end-1,:)];   % end will be added below in the next iteration
+                                    else
+                                        % fprintf("\n");
+                                        interp_waypoints = [interp_waypoints;
+                                                            waypoints(idx,:)];
+                                    end
+                                end
+                                
+                                fprintf('[A*] Goal after t_g augmentation has %d elements.\n', size(interp_waypoints, 1))
+                                waypoints = interp_waypoints;
 
                                 return
                             end

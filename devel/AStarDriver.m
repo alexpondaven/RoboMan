@@ -37,8 +37,13 @@ disp('Created occupancy grid.')
 
 % TODO fix bugs in reachability analysis!!!
 
-startPos = [ 75, -200, 50, 0 ];
-endPos =   [ 125, -125, 50, -pi/2 ];
+% one of the furthest translations
+% startPos = [ 75, -200, 50, 0 ];
+% endPos =   [ 150, 150, 50, -pi/2 ];
+
+% simple 90 deg rotation
+startPos = [ 2.253317e+02, 3.456547e-01, 6.907029e+01,  -1.567728e+00 ];
+endPos =   [ 225, 0, 50, 0 ];
 
 % startPos = [ 145, 50, 75, 0 ];
 % endPos =   [ 145, 50, 45, -pi/2 ];
