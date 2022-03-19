@@ -85,27 +85,34 @@ if initDynamixels(port_num, 'vel') == 0
 
     % Video setup: {[1,1,"away"],[2,1,"down"],[3,1,"away"]}
     % Task 2a Translation - from start to arbitrary finish location
-    % cubeMoves = [[1,4,0]
-    %              [2,5,1]
-    %              [3,6,1]];
+    cubeMoves = [[1,4,0]
+                 [2,5,1]
+                 [3,6,1]];
     % cubeMoves = [5,2,-1];
-    cubeMoves = [3,3,1];
-    cubeStacks = [0,0,1,0,0,0];
+    % cubeMoves = [3,6,1];
+    cubeStacks = [1,1,1,0,0,0];
 
 
     % Task 2b Rotation inplace - so red face is at top
-    % cubeMoves = [[1,1,-1]
-    %              [2,2,1]
-    %              [2,2,1]
-    %              [3,3,-1]];
-    % cubeStacks = [1,1,1,0,0,0];
+    cubeMoves = [[1,1,-1]
+                 [2,2,1]
+                 [2,2,1]
+                 [3,3,-1]];
+    cubeStacks = [1,1,1,0,0,0];
 
     % Task 3b Stacking - stack in any finishing location (4?), with all red
     % faces facing away
-    % cubeMoves = [[1,4,0]
-    %              [2,4,1]
-    %              [3,4,0]];
-    % cubeStacks = [1,1,1,0,0,0];
+    cubeMoves = [[1,4,0]
+                 [2,4,1]
+                 [3,4,0]];
+    cubeStacks = [1,1,1,0,0,0];
+
+    % Stacking on 2
+    cubeMoves = [[2,2,-1]
+                 [1,2,0]
+                 [3,2,0]];
+    cubeStacks = [1,1,1,0,0,0];
+
     
     % Test movements
     % cubeMoves = [2,2,1];
@@ -153,7 +160,7 @@ if initDynamixels(port_num, 'vel') == 0
                 disp("[testCubeManip2] Drop cube");
                 % Smaller depth for dropping
                 
-                if cubePickPlace(endPos, endPos - [0,0,GRAB_DEPTH-7.5,0], endPos, false, port_num) ~= 0
+                if cubePickPlace(endPos, endPos - [0,0,GRAB_DEPTH-4,0], endPos, false, port_num) ~= 0
                     disp("[testCubeManip2] Drop cube failed")
                     return
                 end
