@@ -73,24 +73,20 @@ if initDynamixels(port_num, 'vel') == 0
     servoLimits = getServoLimits();
     velocityLimit = getDXLSettings().velocityLimit;
 
-    setGripperPos(false, port_num);
+    setGripperPos(ture, port_num);
+    % moving to the pen
+    %z_to be tuned tmr
+    z_pick = 90;
+    pick = [75 -75 z_pick
+            100 -100 z_pick];
 
-    % Z-axis offset
-    z = 47;
-    % Corners
-    coords = [ 200 60  z
-               200 140 z
-               125 140 z
-               200 60  z ];
-
-     % interpolate lines between corners
      corners = [];
      numPoints = 10;
      for i=2:length(coords)
         corners = [corners; linearInterpolate(coords(i-1,:), coords(i,:), numPoints) ];
      end
 
-     GRIP_POS = deg2rad(300);
+     %GRIP_POS = deg2rad(300);
 
      curr_pos = zeros(1,4);
      for i=1:4
@@ -103,7 +99,50 @@ if initDynamixels(port_num, 'vel') == 0
      for j=1:size(corners, 1)
          % corners(j,:)
          %  theta = inverseKinDynamixel3(corners(j, 1), corners(j, 2), corners(j, 3), -pi/2,pi/4,GRIP_POS);
-         theta = inverseKinDynamixel(corners(j, 1), corners(j, 2), corners(j, 3), 0, GRIP_POS);
+         theta = inverseKinDynamixel2(corners(j, 1), corners(j, 2), corners(j, 3), 0, ture);
+         vias = [vias; theta(1:4)];
+     end
+
+      % Interpolate between waypoints
+    [T, Tend] = assignViaTimes(vias, 'dvel');    % Tend no longer used
+    coeffs = interpQuinticTraj(vias, T);
+    figure
+    plotQuinticInterp(vias, coeffs, T);
+
+    mainServoLoop2(coeffs, T, Tend, port_num, true, vias);
+    setGripperPos(false, port_num);
+            
+
+
+    % Z-axis offset
+    z = 47;
+    % lines coords
+    coords = [ 200 60  z
+               200 140 z
+               125 140 z
+               200 60  z ];
+
+     % interpolate lines between corners
+     corners = [];
+     numPoints = 10;
+     for i=2:length(coords)
+        corners = [corners; linearInterpolate(coords(i-1,:), coords(i,:), numPoints) ];
+     end
+
+     %GRIP_POS = deg2rad(300);
+
+     curr_pos = zeros(1,4);
+     for i=1:4
+         curr_pos(i) = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_POSITION);
+     end
+     
+     currEndpointCoords = getCurrEndpointCoords(curr_pos);
+     %  calculate vias with adajustment to the gripper angle_thetaG  
+     vias = curr_pos;
+     for j=1:size(corners, 1)
+         % corners(j,:)
+         %  theta = inverseKinDynamixel3(corners(j, 1), corners(j, 2), corners(j, 3), -pi/2,pi/4,GRIP_POS);
+         theta = inverseKinDynamixel2(corners(j, 1), corners(j, 2), corners(j, 3), 0, ture);
          vias = [vias; theta(1:4)];
      end
 
@@ -120,7 +159,8 @@ if initDynamixels(port_num, 'vel') == 0
     radius=40;
     num_points=20;
 
-    circle=semicircle2(origin,radius,num_points);
+    % generate way points for the circle
+    circle=semicircle3(origin,radius,num_points);
 
 
     curr_pos = zeros(1,4);
@@ -132,7 +172,7 @@ if initDynamixels(port_num, 'vel') == 0
      %  calculate vias with adajustment to the gripper angle_thetaG  
      vias = curr_pos;
      for j=1:size(circle, 1)
-         theta = inverseKinDynamixel(circle(j, 1), circle(j, 2), circle(j, 3), 0, GRIP_POS);
+         theta = inverseKinDynamixel2(circle(j, 1), circle(j, 2), circle(j, 3), 0, ture);
          vias = [vias; theta(1:4)];
      end
 
