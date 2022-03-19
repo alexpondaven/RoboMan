@@ -58,7 +58,7 @@ if initDynamixels(port_num, 'vel') == 0
 
     % CONSTANTS
     ogParams = getOccupancyGridParams();
-    GRAB_DEPTH = ogParams.HOVER_HEIGHT + ogParams.CUBE_DIM/2; % How far to descend when grabbing/picking cube
+    GRAB_DEPTH = ogParams.HOVER_HEIGHT + ogParams.CUBE_DIM/2 + 10; % How far to descend when grabbing/picking cube
     isPlot = true;
 
     % Setup
@@ -85,29 +85,30 @@ if initDynamixels(port_num, 'vel') == 0
 
     % Video setup: {[1,1,"away"],[2,1,"down"],[3,1,"away"]}
     % Task 2a Translation - from start to arbitrary finish location
-    cubeMoves = [[1,4,0]
-                 [2,5,0]
-                 [3,6,0]];
-    cubeStacks = [1,1,1,0,0,0];
+    % cubeMoves = [[1,4,0]
+    %              [2,5,1]
+    %              [3,6,1]];
+    cubeMoves = [4,1,-1];
+    cubeStacks = [0,0,0,1,0,0];
 
 
     % Task 2b Rotation inplace - so red face is at top
-    cubeMoves = [[1,1,-1]
-                 [2,2,1]
-                 [2,2,1]
-                 [3,3,-1]];
-    cubeStacks = [1,1,1,0,0,0];
+    % cubeMoves = [[1,1,-1]
+    %              [2,2,1]
+    %              [2,2,1]
+    %              [3,3,-1]];
+    % cubeStacks = [1,1,1,0,0,0];
 
     % Task 3b Stacking - stack in any finishing location (4?), with all red
     % faces facing away
-    cubeMoves = [[1,4,0]
-                 [2,4,1]
-                 [3,4,0]];
-    cubeStacks = [1,1,1,0,0,0];
+    % cubeMoves = [[1,4,0]
+    %              [2,4,1]
+    %              [3,4,0]];
+    % cubeStacks = [1,1,1,0,0,0];
     
     % Test movements
-    cubeMoves = [3,3,1];
-    cubeStacks = [0,1,0,0,0,0];
+    % cubeMoves = [2,2,1];
+    % cubeStacks = [0,1,0,0,0,0];
     
     % Get vias for cube movement
     [cube_via_paths, path_isholdingcube, waypoints] = planCubesPath(cubeMoves, cubeStacks, currEndpointCoords);
@@ -149,8 +150,9 @@ if initDynamixels(port_num, 'vel') == 0
 
                 % Drop cube
                 disp("[testCubeManip2] Drop cube");
-                % Smaller depth for dropping 
-                if cubePickPlace(endPos, endPos - [0,0,GRAB_DEPTH-20,0], endPos, false, port_num) ~= 0
+                % Smaller depth for dropping
+                
+                if cubePickPlace(endPos, endPos - [0,0,GRAB_DEPTH-15,0], endPos, false, port_num) ~= 0
                     disp("[testCubeManip2] Drop cube failed")
                     return
                 end
