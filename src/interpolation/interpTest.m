@@ -79,10 +79,28 @@
 %         1 4 9 1
 %         2 5 2 2
 %         8 2 4 6]};
-vias = [0 0 0 0
-        1 4 9 1
-        2 5 2 2
-        8 2 4 6];
+
+
+% vias = [0 0 0 0
+%         1 4 9 1
+%         2 8 2 2
+%         2 12 2 2
+%         2 16 2 2
+%         2 20 2 2
+%         8 24 4 6];
+
+
+startPos = inverseKinDynamixel2(225, 0, 50, 0, true);
+endPos = inverseKinDynamixel2(225, 0, 25, 0, true);
+vias = linearInterpolate(startPos(1:4), endPos(1:4), 10);
+
+occupancyGrid = createOccupancyGrid([0,1,0,0,0,0]);
+
+startPos = [225, 0, 50, 0];
+endPos = [100, 100, 50, -pi/2];
+vias = calcViaPoints(startPos, endPos, occupancyGrid);
+
+
 Tend =15;
 
 %% Plot different interpolation strategies on the same plot
