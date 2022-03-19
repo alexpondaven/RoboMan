@@ -75,10 +75,166 @@
 % plotQuinticInterp(vias, coeffs, T)
 
 %% Cell array
-vias = {[0 0 0 0
+% vias = {[0 0 0 0
+%         1 4 9 1
+%         2 5 2 2
+%         8 2 4 6]};
+vias = [0 0 0 0
         1 4 9 1
         2 5 2 2
-        8 2 4 6]};
+        8 2 4 6];
 Tend =15;
 
-interpViaPoints(vias,true)
+%% Plot different interpolation strategies on the same plot
+figure
+
+[T_lin, Tend_lin] = assignViaTimes(vias, 'lin');    % Tend no longer used
+coeffs_lin = interpQuinticTraj(vias, T_lin);
+[T_dpos, Tend_dpos] = assignViaTimes(vias, 'dpos');    % Tend no longer used
+coeffs_dpos = interpQuinticTraj(vias, T_dpos);
+[T_acc, Tend_acc] = assignViaTimes(vias, 'acc');    % Tend no longer used
+coeffs_acc = interpQuinticTraj(vias, T_acc);
+[T_dvel, Tend_dvel] = assignViaTimes(vias, 'dvel');    % Tend no longer used
+coeffs_dvel = interpQuinticTraj(vias, T_dvel);
+
+dT_lin = diff(T_lin);
+dT_dpos = diff(T_dpos);
+dT_acc = diff(T_acc);
+dT_dvel = diff(T_dvel);
+
+k = size(dT_lin,2);
+for joint=1:4
+    theta = vias(:,joint);
+    % subplot(2,2,joint)
+    dt = 0.01;
+    t_lin = [];
+    t_dpos = [];
+    t_acc = [];
+    t_dvel = [];
+    
+    interp_lin = [];
+    v_interp_lin = [];
+    a_interp_lin = [];
+    interp_dpos = [];
+    v_interp_dpos = [];
+    a_interp_dpos = [];
+    interp_acc = [];
+    v_interp_acc = [];
+    a_interp_acc = [];
+    interp_dvel = [];
+    v_interp_dvel = [];
+    a_interp_dvel = [];
+
+    for j=1:k
+        i = 6*(j-1) + 1;
+        jt = 0:dt:dT_lin(j);
+        jInterp_lin = coeffs_lin(i,joint) + coeffs_lin(i+1,joint)*jt + coeffs_lin(i+2,joint)*jt.^2 + coeffs_lin(i+3,joint)*jt.^3 + coeffs_lin(i+4,joint)*jt.^4 + coeffs_lin(i+5,joint)*jt.^5;
+        vInterp_lin = coeffs_lin(i+1,joint) + 2*coeffs_lin(i+2,joint)*jt + 3*coeffs_lin(i+3,joint)*jt.^2 + 4*coeffs_lin(i+4,joint)*jt.^3 + 5*coeffs_lin(i+5,joint)*jt.^4;
+        aInterp_lin = 2*coeffs_lin(i+2,joint) + 6*coeffs_lin(i+3,joint)*jt + 12*coeffs_lin(i+4,joint)*jt.^2 + 20*coeffs_lin(i+5,joint)*jt.^3;
+        jt = jt + T_lin(j);
+        
+        t_lin = [t_lin jt];
+        interp_lin = [interp_lin jInterp_lin];
+        v_interp_lin = [v_interp_lin vInterp_lin];
+        a_interp_lin = [a_interp_lin aInterp_lin];
+    end
+
+    for j=1:k
+        i = 6*(j-1) + 1;
+        jt = 0:dt:dT_dpos(j);
+        jInterp_dpos = coeffs_dpos(i,joint) + coeffs_dpos(i+1,joint)*jt + coeffs_dpos(i+2,joint)*jt.^2 + coeffs_dpos(i+3,joint)*jt.^3 + coeffs_dpos(i+4,joint)*jt.^4 + coeffs_dpos(i+5,joint)*jt.^5;
+        vInterp_dpos = coeffs_dpos(i+1,joint) + 2*coeffs_dpos(i+2,joint)*jt + 3*coeffs_dpos(i+3,joint)*jt.^2 + 4*coeffs_dpos(i+4,joint)*jt.^3 + 5*coeffs_dpos(i+5,joint)*jt.^4;
+        aInterp_dpos = 2*coeffs_dpos(i+2,joint) + 6*coeffs_dpos(i+3,joint)*jt + 12*coeffs_dpos(i+4,joint)*jt.^2 + 20*coeffs_dpos(i+5,joint)*jt.^3;
+        jt = jt + T_dpos(j);
+        
+        t_dpos = [t_dpos jt];
+        interp_dpos = [interp_dpos jInterp_dpos];
+        v_interp_dpos = [v_interp_dpos vInterp_dpos];
+        a_interp_dpos = [a_interp_dpos aInterp_dpos];
+    end
+    
+    for j=1:k
+        i = 6*(j-1) + 1;
+        jt = 0:dt:dT_acc(j);
+        jInterp_acc = coeffs_acc(i,joint) + coeffs_acc(i+1,joint)*jt + coeffs_acc(i+2,joint)*jt.^2 + coeffs_acc(i+3,joint)*jt.^3 + coeffs_acc(i+4,joint)*jt.^4 + coeffs_acc(i+5,joint)*jt.^5;
+        vInterp_acc = coeffs_acc(i+1,joint) + 2*coeffs_acc(i+2,joint)*jt + 3*coeffs_acc(i+3,joint)*jt.^2 + 4*coeffs_acc(i+4,joint)*jt.^3 + 5*coeffs_acc(i+5,joint)*jt.^4;
+        aInterp_acc = 2*coeffs_acc(i+2,joint) + 6*coeffs_acc(i+3,joint)*jt + 12*coeffs_acc(i+4,joint)*jt.^2 + 20*coeffs_acc(i+5,joint)*jt.^3;
+        jt = jt + T_acc(j);
+        
+        t_acc = [t_acc jt];
+        interp_acc = [interp_acc jInterp_acc];
+        v_interp_acc = [v_interp_acc vInterp_acc];
+        a_interp_acc = [a_interp_acc aInterp_acc];
+    end
+
+    for j=1:k
+        i = 6*(j-1) + 1;
+        jt = 0:dt:dT_dvel(j);
+        jInterp_dvel = coeffs_dvel(i,joint) + coeffs_dvel(i+1,joint)*jt + coeffs_dvel(i+2,joint)*jt.^2 + coeffs_dvel(i+3,joint)*jt.^3 + coeffs_dvel(i+4,joint)*jt.^4 + coeffs_dvel(i+5,joint)*jt.^5;
+        vInterp_dvel = coeffs_dvel(i+1,joint) + 2*coeffs_dvel(i+2,joint)*jt + 3*coeffs_dvel(i+3,joint)*jt.^2 + 4*coeffs_dvel(i+4,joint)*jt.^3 + 5*coeffs_dvel(i+5,joint)*jt.^4;
+        aInterp_dvel = 2*coeffs_dvel(i+2,joint) + 6*coeffs_dvel(i+3,joint)*jt + 12*coeffs_dvel(i+4,joint)*jt.^2 + 20*coeffs_dvel(i+5,joint)*jt.^3;
+        jt = jt + T_dvel(j);
+
+        t_dvel = [t_dvel jt];
+        interp_dvel = [interp_dvel jInterp_dvel];
+        v_interp_dvel = [v_interp_dvel vInterp_dvel];
+        a_interp_dvel = [a_interp_dvel aInterp_dvel];
+    end
+    
+    % Plot lines
+    subplot(4,3, 3*(joint-1)+1)     % position
+    plot(t_lin, interp_lin, 'r-')
+    hold on
+    plot(t_dpos, interp_dpos, 'g-')
+    plot(t_acc, interp_acc, 'b-')
+    plot(t_dvel, interp_dvel, 'k-')
+    title("Theta " + joint + " position")
+    for via=1:k+1
+        plot(T_lin(via), theta(via),'ro')
+        plot(T_dpos(via), theta(via),'go')
+        plot(T_acc(via), theta(via),'bo')
+        plot(T_dvel(via), theta(via),'ko')
+    end
+    legend("lin", "dpos", "acc", "dvel")
+    grid on
+    
+    subplot(4,3, 3*(joint-1)+2)     % velocity
+    plot(t_lin, v_interp_lin, 'r-')
+    hold on
+    plot(t_dpos, v_interp_dpos, 'g-')
+    plot(t_acc, v_interp_acc, 'b-')
+    plot(t_dvel, v_interp_dvel, 'k-')
+    title("Theta " + joint + " velocity")
+    legend("lin", "dpos", "acc", "dvel")
+    grid on
+    
+    subplot(4,3, 3*(joint-1)+3)     % acceleration
+    plot(t_lin, a_interp_lin, 'r-')
+    hold on
+    plot(t_dpos, a_interp_dpos, 'g-')
+    plot(t_acc, a_interp_acc, 'b-')
+    plot(t_dvel, a_interp_dvel, 'k-')
+    title("Theta " + joint + " acceleration")
+    legend("lin", "dpos", "acc", "dvel")
+    grid on
+    
+    % hold on
+    % plot(t,interp,'k')
+    % plot(t,v_interp,'r--')
+    % plot(t,a_interp,'b--')
+    % title("Theta " + joint)
+    % xlabel("time")
+    % ylabel("theta")
+    
+
+    % % Plot via points
+    % for via=1:k+1
+    %     plot(T(via), theta(via),'ro')
+    % end
+    % legend("pos","vel","acc",'')
+    sgtitle("Quintic interpolation between via points")
+end
+
+
+
+% interpViaPoints(vias,true)

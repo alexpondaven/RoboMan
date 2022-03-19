@@ -12,7 +12,7 @@ dT = diff(T);
 k = size(dT,2);
 for joint=1:4
     theta = vias(:,joint);
-    subplot(2,2,joint)
+    % subplot(2,2,joint)
     dt = 0.01;
     t = [];
     interp = [];
@@ -34,20 +34,42 @@ for joint=1:4
     end
     
     % Plot lines
+    subplot(4,3, 3*(joint-1)+1)     % position
+    plot(t, interp)
     hold on
-    plot(t,interp,'k')
-    plot(t,v_interp,'r--')
-    plot(t,a_interp,'b--')
-    title("Theta " + joint)
-    xlabel("time")
-    ylabel("theta")
-    
-
-    % Plot via points
+    title("Theta " + joint + " position")
     for via=1:k+1
         plot(T(via), theta(via),'ro')
     end
-    legend("pos","vel","acc",'')
+    grid on
+    
+    subplot(4,3, 3*(joint-1)+2)     % velocity
+    plot(t,v_interp)
+    title("Theta " + joint + " velocity")
+    grid on
+    
+    subplot(4,3, 3*(joint-1)+3)     % acceleration
+    plot(t,a_interp)
+    title("Theta " + joint + " acceleration")
+    grid on
+
+    [max_accel, max_accel_idx] = max(abs(a_interp));
+    fprintf("Peak acceleration: %0.2f @ %0.2fs\n", max_accel, t(max_accel_idx));
+    
+    % hold on
+    % plot(t,interp,'k')
+    % plot(t,v_interp,'r--')
+    % plot(t,a_interp,'b--')
+    % title("Theta " + joint)
+    % xlabel("time")
+    % ylabel("theta")
+    
+
+    % % Plot via points
+    % for via=1:k+1
+    %     plot(T(via), theta(via),'ro')
+    % end
+    % legend("pos","vel","acc",'')
     sgtitle("Quintic interpolation between via points")
     
 end
