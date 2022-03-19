@@ -27,7 +27,7 @@ function [coeff_paths, T_paths, Tend_paths] = interpViaPoints(via_paths, isPlot)
             T = [];
             Tend = 0;
         else
-            [T, Tend] = assignViaTimes(vias, 'lin');    % Tend no longer used
+            [T, Tend] = assignViaTimes(vias, 'acc');    % Tend no longer used
             coeffs = interpQuinticTraj(vias, T);
 %             coeffs = interpCubicTraj(vias, T);
             

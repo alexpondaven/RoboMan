@@ -53,7 +53,7 @@ function retCode = cubePickPlace(goalPos, cubePos, nextStartPos, pickOrPlace, po
     viaAngles = [curr_pos; viaAngles];
 
     % We use the primitive function because we will only have 1 via to pass through
-    [T, Tend] = assignViaTimes(viaAngles, 'dvel');
+    [T, Tend] = assignViaTimes(viaAngles, 'acc');
     coeffs = interpQuinticTraj(viaAngles, T);
     Tend
     % [coeffs, T, Tend] = interpViaPoints(viaAngles, true);
