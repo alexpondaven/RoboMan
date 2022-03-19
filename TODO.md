@@ -140,3 +140,21 @@ NOTES:
 - For 
 cubePickPlace([225, 0, 50, -pi/2], [225, 0, 30, -pi/2], [225, 0, 50, -pi/2], true, port_num)
 cubePickPlace([225, 0, 50, 0], [225, 0, 20, 0], [225, 0, 50, 0], true, port_num)
+
+Things to try:
+- Change the grid resolution in A*
+- Tune the PID parameters back to default
+  - Decrease P gains to stop sticking to positions?
+- Tune parameters for new gripper (first check it can get to 2nd placeholder)
+- Interpolation for theta G in A*
+- Destination cube height solution
+
+
+startIdx =
+
+     3    18    13    10
+
+
+goalIdx =
+
+     5     5    18     6
