@@ -12,7 +12,7 @@ function ogParams = getOccupancyGridParams()
     
 
     % ogParams.THETA_G_LIST = -180:22.5:0;  % Angle to step through from -180 (pointing backwards) to 0 (pointing forwards)
-    ogParams.THETA_G_LIST = -90:10:0;  % Angle to step through from -180 (pointing backwards) to 0 (pointing forwards)
+    ogParams.THETA_G_LIST = -90:22.5:0;  % Angle to step through from -180 (pointing backwards) to 0 (pointing forwards)
     ogParams.THETA_1_LIST = -90:5:90;  % Left and right limits
     ogParams.X_LIST = 0:ogParams.xy_resolution:250;
     ogParams.Y_LIST = 0:ogParams.xy_resolution:250;
