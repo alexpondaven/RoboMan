@@ -19,9 +19,10 @@ function [coeff_paths, T_paths, Tend_paths] = interpViaPoints(via_paths, isPlot)
         % vias(1,:) = curr_pos;
 
         % Interpolate between waypoints
+        fprintf("Vias for via_paths{%d}\n", i);
         vias = via_paths{i}
-        
-        if size(vias,1)==0
+
+        if size(vias,1) <= 1
             coeffs = [];
             T = [];
             Tend = 0;
