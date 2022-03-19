@@ -1,7 +1,10 @@
 function raw_angles = inverseKinDynamixel2(x,y,z,theta_G,gripOpen)
 % Function to convert raw angles in radians to Dynamixel servo ticks.
 
-    raw_angles = inverseKin2(x,y,z,theta_G,gripOpen);
+    [raw_angles, ec] = inverseKin2(x,y,z,theta_G,gripOpen);
+    if ec~=0
+        IK_ErrorCodes(ec);
+    end
     PARAMS = getJointParams();
     
     % modify raw_angles
