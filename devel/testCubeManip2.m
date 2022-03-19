@@ -88,8 +88,9 @@ if initDynamixels(port_num, 'vel') == 0
     % cubeMoves = [[1,4,0]
     %              [2,5,1]
     %              [3,6,1]];
-    cubeMoves = [4,1,-1];
-    cubeStacks = [0,0,0,1,0,0];
+    % cubeMoves = [5,2,-1];
+    cubeMoves = [3,3,1];
+    cubeStacks = [0,0,1,0,0,0];
 
 
     % Task 2b Rotation inplace - so red face is at top
@@ -152,7 +153,7 @@ if initDynamixels(port_num, 'vel') == 0
                 disp("[testCubeManip2] Drop cube");
                 % Smaller depth for dropping
                 
-                if cubePickPlace(endPos, endPos - [0,0,GRAB_DEPTH-15,0], endPos, false, port_num) ~= 0
+                if cubePickPlace(endPos, endPos - [0,0,GRAB_DEPTH-7.5,0], endPos, false, port_num) ~= 0
                     disp("[testCubeManip2] Drop cube failed")
                     return
                 end

@@ -4,7 +4,7 @@ function dimensions = getArmDimensions()
     dimensions.L1 = 128;
     dimensions.L2 = 24;
     dimensions.L3 = 124;
-    dimensions.L4 = 75 + 37.5;        % Alter this parameter for end effector grip position
+    dimensions.L4 = 75 + 22.5;        % Alter this parameter for end effector grip position (27.5)
                                     % 75 is the distance to the gripper adapter
     dimensions.L5 = 10;
     dimensions.theta_go = atan2(dimensions.L5, dimensions.L4);
