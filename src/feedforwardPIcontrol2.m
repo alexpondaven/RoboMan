@@ -11,7 +11,7 @@ function [jointVel, errorIntegral] = feedforwardPIcontrol2(desiredVel, error, pr
 % errorIntegral : summing prevError and error
 
     % TODO Tune Ki / Kp / Kd values
-    Kp = [4.0 6.0 7.0 6.0];
+    Kp = [4.0 4.0 4.0 4.0];
     Ki = [0.0 0.0 0.0 0.0];
     Kd = [1.0 15.0 15.0 6.0];
 
