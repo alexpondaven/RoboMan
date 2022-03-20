@@ -16,7 +16,7 @@ VEL_SCALING = 0.175;      % TODO Tune this
 maxVel = (getDXLSettings().velocityLimit/60*0.229*4096) * VEL_SCALING;
 % Convert (scaled) RPM to Ticks/second and apply scaling
 Tend = maxTotalDist / maxVel;
-Tend = min( 6.5, max( 1, Tend ))  % floor and ceiling these
+Tend = min( 50, max( 1, Tend ))  % floor and ceiling these
 % Tend = 2;  % fr now
 
 k = size(vias,1)-1;
