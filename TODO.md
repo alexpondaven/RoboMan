@@ -73,10 +73,34 @@
 - [ ] making thetaG variable axross the drwaing 
 
 ## Task 4 Self-Proposed task
-- [ ] Finalize something feasible
-- [ ] CAD required items
-- [ ] 3D print required items
-- [ ] ...
+- [ ] CAD the gripper to rotate through translation
+- [ ] Extend wire of buzzer
+- [ ] Plan trajectory of wire
+- [ ] Code structure
+  - [ ] Helper: Theta 5 (how open gripper is) -> Rotation of gripper
+  - [ ] Helper: Path generation
+    1. Take waypoints - corners? and interpolate lines between them
+    2. More adaptable - take picture of path to determine waypoints, and then follow these
+    3. Determine how to rotate based on direction of path
+  - [ ] Main
+    1. 
+- [ ] Steps
+  1. Draw path by hand (or declare waypoints manually)
+  e.g.
+  ¦
+  ¦
+   \
+    \
+    /
+   /
+  ¦
+  ¦
+  2. Determine angle of buzzer depending on direction of path
+  3. 
+
+
+
+
 
 ## General
 - [ ] Easy entry point to calibrate each servo with position based offsets (for actual day)
