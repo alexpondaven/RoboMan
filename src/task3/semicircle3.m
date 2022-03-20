@@ -33,6 +33,6 @@ delta = arc/(numPoints-1);
 %positive and negative depends on upper/lower semicircle
 
     end
-
+    points(:,4) = 0;
 
 end
