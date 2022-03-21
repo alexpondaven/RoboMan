@@ -45,11 +45,13 @@ for joint=1:4
     
     subplot(4,3, 3*(joint-1)+2)     % velocity
     plot(t,v_interp)
+    hold on
     title("Theta " + joint + " velocity")
     grid on
     
     subplot(4,3, 3*(joint-1)+3)     % acceleration
     plot(t,a_interp)
+    hold on
     title("Theta " + joint + " acceleration")
     grid on
 
