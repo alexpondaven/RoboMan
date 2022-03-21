@@ -73,17 +73,16 @@
 - [ ] making thetaG variable axross the drwaing 
 
 ## Task 4 Self-Proposed task
-- [ ] CAD the gripper to rotate through translation
-- [ ] Extend wire of buzzer
+- [x] CAD the gripper to rotate through translation
+- [x] Extend wire of buzzer
 - [ ] Plan trajectory of wire
 - [ ] Code structure
-  - [ ] Helper: Theta 5 (how open gripper is) -> Rotation of gripper
-  - [ ] Helper: Path generation
+  - [x] Helper: Theta 5 (how open gripper is) -> Rotation of gripper
+  - [x] Helper: Path generation
     1. Take waypoints - corners? and interpolate lines between them
     2. More adaptable - take picture of path to determine waypoints, and then follow these
     3. Determine how to rotate based on direction of path
-  - [ ] Main
-    1. 
+  - [x] Main driver
 - [ ] Steps
   1. Draw path by hand (or declare waypoints manually)
   e.g.
@@ -97,6 +96,16 @@
   ¦
   2. Determine angle of buzzer depending on direction of path
   3. 
+
+## Monday TODO
+- Before session
+  - [ ] Verify if waypoints / angles look good for Task 4
+- During session
+  - [ ] Tune / figure out new gripper
+    - [ ] Figure out mapping from buzzAngle to theta5
+  - [ ] Try basic path, more complicated path, 3D
+  - [ ] Re-record Task 2 with better Tend adjustment
+
 
 
 
