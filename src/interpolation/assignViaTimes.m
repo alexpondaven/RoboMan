@@ -70,6 +70,44 @@ elseif strat=="acc"
     normT = Tend * timeProp / sum(timeProp);
     T = [0; cumsum(normT)]';
    
+elseif strat=="acc2"
+    %% Heuristic based acceleration
+    % Acceleration heuristic is 1D Laplace filter [1, -2, 1]
+   
+    accHeur = zeros(size(vias));
+    for joint=1:size(vias,2)
+        theta = vias(:,joint);
+    
+        for i=1:k+1
+            if i==1
+                window = [theta(i); theta(i); theta(i+1)];
+            elseif i==k+1
+                window = [theta(i-1); theta(i); theta(i)];
+            else
+                window = theta(i-1:i+1);
+            end
+            laplace = [1 -2 1] * window;    % Take the dot product
+            accHeur(i,joint) = laplace;
+        end
+    end
+
+    accHeurNorm = zeros(k, size(vias,2));
+    for i=1:k
+        % Take the mean of pointwise accelerations
+        % no need to divide by 2, we normalise later anyway
+        accHeurNorm(i,:) = accHeur(i,:) + accHeur(i+1,:);
+    end
+
+    % Take max acceleration of each theta to determine how to space in time
+    maxAcc = max(abs(accHeurNorm),[],2);
+    normAcc = maxAcc / sum(maxAcc);
+
+    % Assign more time to higher accelerations
+    offset = 2/k;        % todo param to be tuned
+    timeProp = normAcc + offset;
+    normT = Tend * timeProp / sum(timeProp);
+    T = [0; cumsum(normT)]';
+
 elseif strat=="dvel"
     %% Heuristic based - velocity change
     % Velocity heuristic is 1D Laplace filter [-1, 1]
