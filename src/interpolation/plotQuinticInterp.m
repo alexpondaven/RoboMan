@@ -10,7 +10,7 @@ function plotQuinticInterp(vias, coeffs, T)
 % close
 dT = diff(T);
 k = size(dT,2);
-for joint=1:4
+for joint=1:size(vias,2)
     theta = vias(:,joint);
     % subplot(2,2,joint)
     dt = 0.01;

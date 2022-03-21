@@ -62,21 +62,26 @@ if initDynamixels(port_num, 'vel') == 0
     isPlot = true;
     % Generate path
     [waypoints, buzzAngle] = genBuzzPath();
-    theta5 = arrayfun(buzzAngleToTheta5, buzzAngle);
+    theta5 = arrayfun(buzzAngleToTheta5, buzzAngle); % In radians
+    
+    % Want to now interpolating theta5 values as well!
 
-    % IK - convert to joint angles
-    theta_vias = zeros( size(waypoints, 1), 4 );
+    % IK - convert to joint angles in ticks
+    theta_vias = zeros( size(waypoints, 1), 5 );
     for i=1:size(waypoints, 1)
         % Note: Gripper open/close not important here as only theta1..4 taken
-        ikResult = inverseKinDynamixel2( waypoints(i,1), waypoints(i,2), waypoints(i,3), waypoints(i,4), true ); 
-        theta_vias(i, :) = ikResult(1:4);
+        ikResult = inverseKinDynamixelT4( waypoints(i,1), waypoints(i,2), waypoints(i,3), waypoints(i,4), theta5); 
+        theta_vias(i, :) = ikResult;
     end
+
     % Interpolation of joint angles for single path {theta_vias}
     [coeff_paths, T_paths, Tend_paths] = interpViaPoints({theta_vias}, isPlot);
+    
+    % Add theta5
 
     % Follow trajectory - should just be one path
     disp("[playBuzzWire] Move buzz wire");
-    if mainServoLoop2(coeff_paths{1}, T_paths{1}, Tend_paths{1}, port_num, isPlot, cube_via_paths{i}) ~= 0
+    if mainServoLoop2(coeff_paths{1}, T_paths{1}, Tend_paths{1}, port_num, isPlot, cube_via_paths{1}) ~= 0
         disp("[playBuzzWire] Move buzz wire failed")
         return
     end

@@ -25,7 +25,7 @@ nconstr = 5;
 
 % Interpolate for all 4 theta values (each column of vias)
 coeffs = [];
-for joint=1:4
+for joint=1:size(vias,2)
     theta = vias(:,joint);
     
     % Create simultaneous equations

@@ -20,6 +20,7 @@ Tend = min( 50, max( 1, Tend ))  % floor and ceiling these
 % Tend = 2;  % fr now
 
 k = size(vias,1)-1;
+numJoints = size(vias,2);
 
 if strat=="lin"
     %% Space linearly strategy
@@ -36,8 +37,8 @@ elseif strat=="acc"
     %% Heuristic based acceleration
     % Acceleration heuristic is 1D Laplace filter [1, -2, 1]
    
-    accHeur = zeros(k+1,4);
-    for joint=1:4
+    accHeur = zeros(k+1,numJoints);
+    for joint=1:numJoints
         theta = vias(:,joint);
     
         for i=1:k+1
@@ -53,7 +54,7 @@ elseif strat=="acc"
         end
     end
 
-    accHeurNorm = zeros(k,4);
+    accHeurNorm = zeros(k,numJoints);
     for i=1:k
         % Take the mean of both accelerations
         % no need to divide by 2, we normalise later anyway
@@ -112,8 +113,8 @@ elseif strat=="dvel"
     %% Heuristic based - velocity change
     % Velocity heuristic is 1D Laplace filter [-1, 1]
     
-    velHeur = zeros(k+1,4);
-    for joint=1:4
+    velHeur = zeros(k+1,numJoints);
+    for joint=1:numJoints
         theta = vias(:,joint);
       
         for i=1:k+1
