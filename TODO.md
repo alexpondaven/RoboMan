@@ -1,3 +1,19 @@
+# DEMO DAY CHECKLIST
+## Task 2
+- [ ] Set angle in `setGripperPos` accordingly
+- [ ] Check arm dimensions in `getArmDimensions`
+- [ ] Edit coordinates of cube holders in **WHERE**?
+- [ ] Come up with robot path in `testCubeManip2`
+## Task 3
+- [ ] Set angle in `setGripperPos` accordingly
+- [ ] Check arm dimensions in `getArmDimensions`
+- [ ] Update robot path in `testDrawing`
+## Task 4
+- [ ] Disable Servo 5 limit check in `initDynamixels`
+- [ ] Disable Servo 5 auto open in `initDynamixels`
+- [ ] Set the initial angle of the wire
+- [ ] Run `playBuzzWire`
+
 # TODO
 ## Task 2.1 Cube Translation, Task 2.2 Cube Rotation
 - [ ] {Alex} Skeleton code for the entirety of Task 2.1/2, able to specify the orientations and locations of the cubes
