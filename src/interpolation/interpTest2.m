@@ -6,4 +6,4 @@ vias = [0 0 0 0 5
 
 [T, Tend] = assignViaTimes(vias, 'lin');    % Tend no longer used
 coeffs = interpQuinticTraj(vias, T);
-plotQuinticInterp(coeffs, vias, T)
+plotQuinticInterp(vias,coeffs, T)
