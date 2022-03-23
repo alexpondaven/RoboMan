@@ -13,6 +13,7 @@
 - [ ] Disable Servo 5 auto open in `initDynamixels`
 - [ ] Set the initial angle of the wire
 - [ ] Run `playBuzzWire`
+- [ ] Set Tend in `assignViaTimes`
 
 # TODO
 ## Task 2.1 Cube Translation, Task 2.2 Cube Rotation

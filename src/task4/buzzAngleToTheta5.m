@@ -10,9 +10,21 @@ function theta5 = buzzAngleToTheta5(buzzerAngle, theta1)
 % Returns:
 % theta5      : Joint angle of servo 5 (opening/closing gripper)
 
-    theta5 = rad2deg(buzzerAngle - theta1);
+    theta5_cmd = rad2deg(buzzerAngle - theta1);
+    
+    % set - 90 deg @ center (464)
+    % set -180 deg @ (0)
+    % set 0 deg @ (928)
+    theta5 = theta5_cmd * (928/180) + 928;  %linear relationship, see onenote
 
-    theta5 = theta5 * (928/135) + 928;  %linear relationship, see onenote
+    % error checking
+    if theta5 > 928
+        fprintf("[buzzAngleToTheta5] theta 5 above bounds: commanded %0.1fdeg, %d ticks\n", theta5_cmd, theta_5);
+        theta5 = 928;
+    elseif theta5 < 0
+        fprintf("[buzzAngleToTheta5] theta 5 below bounds: commanded %0.1fdeg, %d ticks\n", theta5_cmd, theta_5);
+        theta5 = 0;
+    end
 
     % min -> 0   -> \ (closed)
     %     -> 287 -> -

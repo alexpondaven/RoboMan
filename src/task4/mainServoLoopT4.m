@@ -98,7 +98,7 @@ while ~( last_seg && all( abs(curr_err) < 2 ) )
 
     % Write current
     currTheta5Tick = theta5(targetIdx);
-    fprintf("%0.2f, %d\n", currTheta5Tick, targetIdx);
+    fprintf("[mainServoLoopT4] %0.2f, %d\n", currTheta5Tick, targetIdx);
     write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(5), params.ADDR_PRO_GOAL_POSITION, currTheta5Tick);
 
     last_seg = targetIdx == size(T,2);

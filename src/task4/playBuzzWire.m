@@ -77,7 +77,7 @@ if initDynamixels(port_num, 'vel') == 0
     [coeff_paths, T_paths, Tend_paths] = interpViaPoints({theta_vias}, isPlot);
     
     % Add theta5
-    theta1_rads = (theta_vias(:,1) * pi /2048)' - pi;   % convert back to radians, remove offset
+    theta1_rads = (theta_vias(:,1) * pi /2048) - pi;   % convert back to radians, remove offset
     theta5 = buzzAngleToTheta5(buzzAngle, theta1_rads);
 
     % Follow trajectory - should just be one path
