@@ -4,7 +4,7 @@ function points = semicircle4(startp, endp, theta, numPoints)
 %center   center of the circle
 %radius   radius of the circle
 %numpoints     number of samples between points
-points = zeros(numPoints, length(startp));
+%points = zeros(numPoints, length(startp));
 temp = zeros(numPoints, length(startp));
 
 %arc-length is determined by angle
@@ -21,12 +21,15 @@ center = (startp+endp)./2;
     end
     points=[];    
     for i=0:numPoints-1
-        if temp(i+1,1)<=0 && temp(i+1,2)>=0
+        if temp(i+1,1)<center(1) && temp(i+1,2)<center(2)
             points=[points;temp(i+1,:)];
+        elseif temp(i+1,1)==0 && temp(i+1,2)==0
         else
-            %points=[points;temp(i+1,:)];
+            %points=[points; temp(i+1,:)];
         end
     end
+    points = points(1:end-1,:);
+  
    
                 
             
