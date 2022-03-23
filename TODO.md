@@ -115,14 +115,23 @@
 
 ## Monday TODO
 - Before session
-  - [ ] Verify if waypoints / angles look good for Task 4
+  - [x] Verify if waypoints / angles look good for Task 4
 - During session
-  - [ ] Tune / figure out new gripper
-    - [ ] Figure out mapping from buzzAngle to theta5
-  - [ ] Try basic path, more complicated path, 3D
+  - [x] Tune / figure out new gripper
+    - [x] Figure out mapping from buzzAngle to theta5
+  - [x] Try basic path, more complicated path, 3D
   - [ ] Re-record Task 2 with better Tend adjustment
 
-
+## Wednesday TODO
+- MUST
+    - [ ] Record more complicated path
+    - [ ] Find a way to fix position of wire, so we aren't playing around with it
+- Path 1
+    - [ ] Fix on new gripper
+    - [ ] Fix IK to get it to work
+    - [ ] Run on complicated path
+- Path 2
+    - [ ] Re-record Task 2 with better Tend adjustment / accuracy
 
 
 
