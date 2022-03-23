@@ -1,5 +1,6 @@
-function [T,Tend] = assignViaTimes(vias, strat)
+function [T, coeffs, Tend] = assignViaTimes2(vias, strat)
 % assignViaTimes Assign times to each via point according to strategy
+% and come up with coefficients
 %
 % Args
 % vias  : Waypoints / via points of each theta (4 values in each row)
@@ -7,71 +8,24 @@ function [T,Tend] = assignViaTimes(vias, strat)
 %
 % Return
 % T     : Time of each via point (should be same #rows as vias)
+% 
 % Tend  : Time to reach last via point
 
+k = size(vias,1)-1;     % Number of spacings to put in 
 
-% Determine Tend proportional to the max total distance travelled
-maxTotalDist = max(sum(abs(diff(vias))));
-VEL_SCALING = 0.175;      % TODO Tune this
-maxVel = (getDXLSettings().velocityLimit/60*0.229*4096) * VEL_SCALING;
-% Convert (scaled) RPM to Ticks/second and apply scaling
-Tend = maxTotalDist / maxVel;
-Tend = min( 50, max( 1, Tend ))  % floor and ceiling these
-% Tend = 2;  % fr now
-
-k = size(vias,1)-1;
-numJoints = size(vias,2);
-
+% For now, T is a vector from 0-1.
 if strat=="lin"
     %% Space linearly strategy
-    T = Tend * cumsum([0,ones(1,k)])/k;
+    T = cumsum([0,ones(1,k)])/k;
 
 elseif strat=="dpos"
     %% Heuristic based - change in position
     % Assign more time when position changes a lot
     maxPosDiff = max(abs(diff(vias)),[],2);
-    timeProp = Tend * maxPosDiff / sum(maxPosDiff);
+    timeProp = maxPosDiff / sum(maxPosDiff);
     T = [0; cumsum(timeProp)]';
 
 elseif strat=="acc"
-    %% Heuristic based acceleration
-    % Acceleration heuristic is 1D Laplace filter [1, -2, 1]
-   
-    accHeur = zeros(k+1,numJoints);
-    for joint=1:numJoints
-        theta = vias(:,joint);
-    
-        for i=1:k+1
-            if i==1
-                window = [theta(i); theta(i); theta(i+1)];
-            elseif i==k+1
-                window = [theta(i-1); theta(i); theta(i)];
-            else
-                window = theta(i-1:i+1);
-            end
-            laplace = [1 -2 1] * window;
-            accHeur(i,joint) = laplace;
-        end
-    end
-
-    accHeurNorm = zeros(k,numJoints);
-    for i=1:k
-        % Take the mean of both accelerations
-        % no need to divide by 2, we normalise later anyway
-        accHeurNorm(i,:) = accHeur(i,:) + accHeur(i+1,:);
-    end
-
-    % Take max acceleration of each theta to determine how to space in time
-    maxAcc = max(abs(accHeurNorm),[],2);
-    normAcc = maxAcc / sum(maxAcc);
-
-    % Assign more time to higher accelerations
-    offset = 0.1;        % param to be tuned
-    timeProp = normAcc + offset;
-    normT = Tend * timeProp / sum(timeProp);
-    T = [0; cumsum(normT)]';
-   
-elseif strat=="acc2"
     %% Heuristic based acceleration
     % Acceleration heuristic is 1D Laplace filter [1, -2, 1]
    
@@ -106,15 +60,15 @@ elseif strat=="acc2"
     % Assign more time to higher accelerations
     offset = 2/k;        % todo param to be tuned
     timeProp = normAcc + offset;
-    normT = Tend * timeProp / sum(timeProp);
+    normT = timeProp / sum(timeProp);
     T = [0; cumsum(normT)]';
-
+   
 elseif strat=="dvel"
     %% Heuristic based - velocity change
     % Velocity heuristic is 1D Laplace filter [-1, 1]
     
-    velHeur = zeros(k+1,numJoints);
-    for joint=1:numJoints
+    velHeur = zeros(k+1,4);
+    for joint=1:4
         theta = vias(:,joint);
       
         for i=1:k+1
@@ -137,12 +91,46 @@ elseif strat=="dvel"
     % Assign more time to higher accelerations
     offset = 0.1;        % param to be tuned
     timeProp = normAcc + offset;
-    normT = Tend * timeProp / sum(timeProp);
+    normT = timeProp / sum(timeProp);
     T = [0; cumsum(normT)]';
 else
     sprintf("%s is not a valid strategy to assign via point times",strat )
     return
 end
+
+% Assign quintic coefficients here first.
+coeffs = interpQuinticTraj(vias, T);
+
+N_SAMPLES = 100;
+dt = 1/N_SAMPLES;
+tvec = 0:dt:1;
+
+% Sample vel and acc:
+accVect = zeros(N_SAMPLES, size(vias,2));
+velVect = zeros(N_SAMPLES, size(vias,2));
+for idx=1:N_SAMPLES
+    accVect(idx,:) = sampleQuinticAcc(coeffs, T, tvec(idx));
+    [velVect(idx,:), ~] = sampleQuinticVel(coeffs, T, tvec(idx));
+end
+
+% Obtain the maximum vel, acc experienced
+peakVel = max(abs(velVect));
+% Obtain the maximum acceleration experienced
+peakAcc = max(abs(accVect));
+
+% Scale Tend based on this value
+% Convert (scaled) RPM to ticks/sec
+velocityLimitTicks = (getDXLSettings().velocityLimit * 0.229) * (4096) / 60;
+Tend = max(peakVel) / (0.7 * velocityLimitTicks);
+
+% Alternatively, scale Tend based on peak acceleration
+% MAX_ACCEL = 80;
+% Tend = MAX_ACCEL / max(peakAcc);
+
+T = T*Tend;
+
+% Lazy to transform coefficients -> Run quintic interp again
+coeffs = interpQuinticTraj(vias, T);
 
 sprintf("T with strategy %s. Tend = %0.4f", strat, Tend);
 T

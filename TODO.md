@@ -1,3 +1,19 @@
+# DEMO DAY CHECKLIST
+## Task 2
+- [ ] Set angle in `setGripperPos` accordingly
+- [ ] Check arm dimensions in `getArmDimensions`
+- [ ] Edit coordinates of cube holders in **WHERE**?
+- [ ] Come up with robot path in `testCubeManip2`
+## Task 3
+- [ ] Set angle in `setGripperPos` accordingly
+- [ ] Check arm dimensions in `getArmDimensions`
+- [ ] Update robot path in `testDrawing`
+## Task 4
+- [ ] Disable Servo 5 limit check in `initDynamixels`
+- [ ] Disable Servo 5 auto open in `initDynamixels`
+- [ ] Set the initial angle of the wire
+- [ ] Run `playBuzzWire`
+
 # TODO
 ## Task 2.1 Cube Translation, Task 2.2 Cube Rotation
 - [ ] {Alex} Skeleton code for the entirety of Task 2.1/2, able to specify the orientations and locations of the cubes
@@ -73,10 +89,52 @@
 - [ ] making thetaG variable axross the drwaing 
 
 ## Task 4 Self-Proposed task
-- [ ] Finalize something feasible
-- [ ] CAD required items
-- [ ] 3D print required items
-- [ ] ...
+- [x] CAD the gripper to rotate through translation
+- [x] Extend wire of buzzer
+- [ ] Plan trajectory of wire
+- [ ] Code structure
+  - [x] Helper: Theta 5 (how open gripper is) -> Rotation of gripper
+  - [x] Helper: Path generation
+    1. Take waypoints - corners? and interpolate lines between them
+    2. More adaptable - take picture of path to determine waypoints, and then follow these
+    3. Determine how to rotate based on direction of path
+  - [x] Main driver
+- [ ] Steps
+  1. Draw path by hand (or declare waypoints manually)
+  e.g.
+  ¦
+  ¦
+   \
+    \
+    /
+   /
+  ¦
+  ¦
+  2. Determine angle of buzzer depending on direction of path
+  3. 
+
+## Monday TODO
+- Before session
+  - [x] Verify if waypoints / angles look good for Task 4
+- During session
+  - [x] Tune / figure out new gripper
+    - [x] Figure out mapping from buzzAngle to theta5
+  - [x] Try basic path, more complicated path, 3D
+  - [ ] Re-record Task 2 with better Tend adjustment
+
+## Wednesday TODO
+- MUST
+    - [ ] Record more complicated path
+    - [ ] Find a way to fix position of wire, so we aren't playing around with it
+- Path 1
+    - [ ] Fix on new gripper
+    - [ ] Fix IK to get it to work
+    - [ ] Run on complicated path
+- Path 2
+    - [ ] Re-record Task 2 with better Tend adjustment / accuracy
+
+
+
 
 ## General
 - [ ] Easy entry point to calibrate each servo with position based offsets (for actual day)
