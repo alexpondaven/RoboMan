@@ -124,11 +124,18 @@ if initDynamixels(port_num, 'vel') == 0
     z = 50;                         % How low to place the thing
     % lines coords
     % TODO make this into an argument?
-    coords = [  200 60  z_prep 0
-                200 60  z      0
-                200 140 z      0
-                125 140 z      0
-                200 60  z      0 ];
+%     coords = [  200 60  z_prep 0
+%                 200 60  z      0
+%                 200 140 z      0
+%                 125 140 z      0
+%                 200 60  z      0 ];
+    
+    % DEMO DAY
+    coords = [  175 100  z_prep 0
+                175 100  z      0
+                175 200 z      0
+                125 150 z      0
+                175 150  z      0 ];
     
     % Interpolate between all points so far
     num_points_lines = 50;
@@ -137,14 +144,27 @@ if initDynamixels(port_num, 'vel') == 0
     end
 
     %% Drawing semicircle
-    origin=[200,100,z];
-    radius=40;
+%     origin=[200,100,z];
+%     radius=40;
+%     num_points_circle=100;
+%     
+%     % generate way points for the circle. 
+%     % TODO make into an argument
+%     circle = semicircle3(origin,radius,num_points_circle);
+%     waypoints_draw = [waypoints_draw; circle];
+
+    % DEMO DAY
+    startP=[175,150,z];
+    center = [200,150,z];
+    circle_theta=3*pi/2; % 270 degrees
     num_points_circle=100;
     
     % generate way points for the circle. 
     % TODO make into an argument
-    circle = semicircle3(origin,radius,num_points_circle);
+    circle = semicircle6(startP, center, circle_theta, num_points_circle);
     waypoints_draw = [waypoints_draw; circle];
+
+
 
     % Calculate IK for drawing
     vias_draw = [];
