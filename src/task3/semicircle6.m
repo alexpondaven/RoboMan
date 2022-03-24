@@ -23,17 +23,17 @@ function points = semicircle6(startP, center, theta, numPoints)
     fprintf("Start: %0.1f . End: %0.1f\n", rad2deg(phi), rad2deg(angles(end)));
 
 
-    % Compute points with this angle (rcos,rsin)
+    % Compute points with this angle (rcos,rsin) + offset by centre
     points = zeros(numPoints,3);
     for i=1:size(angles,2)
-        points(i,1) = radius*cos(angles(i));
-        points(i,2) = radius*sin(angles(i));
+        points(i,1) = radius*cos(angles(i)) + center(1);
+        points(i,2) = radius*sin(angles(i)) + center(2);
         points(i,3) = z;
     end
 
     figure
     plot(points(:,1), points(:,2))
-    axis([-1 1 -1 1])
+%     axis([-1 1 -1 1])
     grid on
 
 end
