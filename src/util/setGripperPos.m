@@ -22,8 +22,13 @@ function retCode = setGripperPos(open, port_num)
     write4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(5), params.ADDR_PRO_GOAL_POSITION, targetAngle);
     
     curr_pos = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(5), params.ADDR_PRO_PRESENT_POSITION);
+    startTime = now;
+    
     while( abs(curr_pos - targetAngle) > 2 )
         curr_pos = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(5), params.ADDR_PRO_PRESENT_POSITION);
+        if ((now-startTime)*24*60*60) > 3
+            break
+        end
     end
 
     retCode = 0;

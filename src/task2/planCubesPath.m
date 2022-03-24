@@ -92,6 +92,11 @@ for i=1:size(cubeMoves,1)
         dst_z = dst_z + TOPGRAB_OFFSET;
     end
 
+    if src_thetaG == -pi/2 && dst_thetaG == 0
+        dst_x = dst_x * 0.97;
+        dst_y = dst_y * 0.97;
+    end
+
     % Generate occupancy grid
     % Convert cubestacks to input to createOccupancyGrid
     occupancyGrid = createOccupancyGrid(currCubeStacks);

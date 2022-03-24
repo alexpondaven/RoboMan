@@ -4,6 +4,7 @@ function [T,Tend] = assignViaTimes(vias, strat)
 % Args
 % vias  : Waypoints / via points of each theta (4 values in each row)
 % strat : Strategy includes ['lin','dpos','acc','dvel']
+%         if it is a numeric, use 'acc' and set Tend manually to that value
 %
 % Return
 % T     : Time of each via point (should be same #rows as vias)
@@ -16,9 +17,13 @@ VEL_SCALING = 0.175;      % TODO Tune this
 maxVel = (getDXLSettings().velocityLimit/60*0.229*4096) * VEL_SCALING;
 % Convert (scaled) RPM to Ticks/second and apply scaling
 Tend = maxTotalDist / maxVel;
-Tend = min( 50, max( 1, Tend ))  % floor and ceiling these
+Tend = min( 50, max( 1, Tend ));  % floor and ceiling these
 
-Tend = 15;  % fr now
+if isnumeric(strat)
+    Tend = strat;       % Easy way to manually set Tend
+    strat = getDXLParams().viaTimeInterpMethod;
+end
+
 
 k = size(vias,1)-1;
 numJoints = size(vias,2);

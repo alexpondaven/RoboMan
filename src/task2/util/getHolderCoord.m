@@ -27,7 +27,7 @@ switch holderNum
         grid = [0,-6];
         thetaG = 0;
     case 5
-        grid = [4,4];
+        grid = [4,-4];
         thetaG = -pi/2;
     case 6
         grid = [9,0];

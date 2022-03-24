@@ -24,7 +24,7 @@ function points = semicircle6(startP, center, theta, numPoints)
 
 
     % Compute points with this angle (rcos,rsin) + offset by centre
-    points = zeros(numPoints,3);
+    points = zeros(numPoints,4);
     for i=1:size(angles,2)
         points(i,1) = radius*cos(angles(i)) + center(1);
         points(i,2) = radius*sin(angles(i)) + center(2);

@@ -165,7 +165,7 @@ function waypoints = AstarSearch( startPos, endPos, occupancyGrid )
                                 % We get a 'complete' set of waypoints here, now we need to interpolate for theta_g
                                 % [x,y,z,thetag] rows
                                 theta_g_diff = diff(waypoints(:,4))';    % convert into a row vector
-                                diff_idxs = find(theta_g_diff)  % Indices of waypoints where there was a change in theta_g
+                                diff_idxs = find(theta_g_diff);  % Indices of waypoints where there was a change in theta_g
                                 interp_waypoints = [];
                                 
                                 for idx=1:size(waypoints,1)

@@ -148,6 +148,8 @@ function status = initDynamixels(port_num, mode)
     ModeCheck = 3==read1ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(5), params.ADDR_PRO_OPERATING_MODE);
     PosUBCheck = servoLimits(5,2)==read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(5), params.ADDR_MAX_POS);
     PosLBCheck = servoLimits(5,1)==read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(5), params.ADDR_MIN_POS);
+    % PosUBCheck = 1;
+    % PosLBCheck = 1;
     if any([ModeCheck, PosUBCheck, PosLBCheck] == 0)
         fprintf("Servo 5 values not written correctly.\n");
         [ModeCheck, PosUBCheck, PosLBCheck]

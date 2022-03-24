@@ -2,12 +2,12 @@
 ## Task 2
 - [ ] Set angle in `setGripperPos` accordingly
 - [ ] Check arm dimensions in `getArmDimensions`
-- [ ] Edit coordinates of cube holders in **WHERE**?
+- [x] Edit coordinates of cube holders in **WHERE**?
 - [ ] Come up with robot path in `testCubeManip2`
 ## Task 3
 - [ ] Set angle in `setGripperPos` accordingly
 - [ ] Check arm dimensions in `getArmDimensions`
-- [ ] Update robot path in `testDrawing`
+- [x] Update robot path in `testDrawing`
 ## Task 4
 - [ ] Disable Servo 5 limit check in `initDynamixels`
 - [ ] Disable Servo 5 auto open in `initDynamixels`

@@ -75,6 +75,23 @@ if initDynamixels(port_num, 'vel') == 0
     %% Path Planning
     % Measure curr pos for robustness
     curr_pos = zeros(1,4);
+    % for i=1:4
+    %     curr_pos(i) = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_POSITION);
+    % end
+
+    % % somewhere safe in joint space
+    
+    % % linear interp
+
+    % %% move in joint space to a new place
+    % assignViaTimes()
+    % interpQuinticTraj
+    
+    % mainServoLoop2();
+
+
+    % % start
+    curr_pos = zeros(1,4);
     for i=1:4
         curr_pos(i) = read4ByteTxRx(port_num, params.PROTOCOL_VERSION, params.DXL_LIST(i), params.ADDR_PRO_PRESENT_POSITION);
     end
@@ -84,7 +101,7 @@ if initDynamixels(port_num, 'vel') == 0
     z_pick = 60;
     z_prep = z_pick + 50;
     coords = [
-        currEndpointCoords          % Current position
+        currEndpointCoords       % Current position
         125 -125 z_pick 0        % Intermediate position to grab the pen
         150 -150 z_pick 0        % Pen grabbing
     ];
@@ -121,7 +138,7 @@ if initDynamixels(port_num, 'vel') == 0
     end
 
     %% Drawing lines
-    z = 50;                         % How low to place the thing
+    z = 53;                         % How low to place the thing
     % lines coords
     % TODO make this into an argument?
 %     coords = [  200 60  z_prep 0
@@ -131,11 +148,12 @@ if initDynamixels(port_num, 'vel') == 0
 %                 200 60  z      0 ];
     
     % DEMO DAY
-    coords = [  175 100  z_prep 0
-                175 100  z      0
-                175 200 z      0
-                125 150 z      0
-                175 150  z      0 ];
+    coords = [  125 12.5 z_prep 0
+                100 175  z_prep 0
+                100 175  z      0
+                200 175  z      0
+                150 125  z      0
+                150 175  z      0 ];
     
     % Interpolate between all points so far
     num_points_lines = 50;
@@ -154,10 +172,10 @@ if initDynamixels(port_num, 'vel') == 0
 %     waypoints_draw = [waypoints_draw; circle];
 
     % DEMO DAY
-    startP=[175,150,z];
-    center = [200,150,z];
+    startP=[150,175,z];
+    center = [175,175,z];
     circle_theta=3*pi/2; % 270 degrees
-    num_points_circle=100;
+    num_points_circle=150;
     
     % generate way points for the circle. 
     % TODO make into an argument

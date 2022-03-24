@@ -5,7 +5,7 @@ function [buzzPath, buzzAngle] = genBuzzPath()
 % Returns:
 % buzzPath      : Set of waypoints [x,y,z,thetaG] that the arm must follow
 % buzzAngle : Buzzer angle at each waypoints
-POINTS_PER_GRID = 10;
+POINTS_PER_GRID = 15;
 
 % Basic:
 % Straight line
@@ -20,13 +20,15 @@ coords = [  8 8 5 0
             6 0 5 0 ] * ogParams.CUBE_DIM;  % grid positions
 
 % Simpler
-z = 115 / ogParams.CUBE_DIM; % Easy way to set in mm
-coords = [  8 - (10)/ogParams.CUBE_DIM  8 z + (0)/ogParams.CUBE_DIM 0
-            8 - (10)/ogParams.CUBE_DIM  7 z + (0)/ogParams.CUBE_DIM 0
-            7 - (10)/ogParams.CUBE_DIM  6 z + (0)/ogParams.CUBE_DIM 0
-            8 - (10)/ogParams.CUBE_DIM  5 z + (0)/ogParams.CUBE_DIM 0
-            7 - (0)/ogParams.CUBE_DIM  3 z + (0)/ogParams.CUBE_DIM 0
-            7 - (0)/ogParams.CUBE_DIM  2.5 z + (0)/ogParams.CUBE_DIM 0] * ogParams.CUBE_DIM;  % grid positions
+z = 111 / ogParams.CUBE_DIM; % Easy way to set in mm
+coords = [  
+    6 - (0)/ogParams.CUBE_DIM  8   z + (0)/ogParams.CUBE_DIM 0 
+    6 - (0)/ogParams.CUBE_DIM  7   z + (0)/ogParams.CUBE_DIM 0
+    5 - (0)/ogParams.CUBE_DIM  5.7   z + (0)/ogParams.CUBE_DIM 0
+    6 - (0)/ogParams.CUBE_DIM  4.7   z + (0)/ogParams.CUBE_DIM 0
+    5 - (0)/ogParams.CUBE_DIM   3   z + (0)/ogParams.CUBE_DIM 0
+    5 - (0)/ogParams.CUBE_DIM   2.5 z + (0)/ogParams.CUBE_DIM 0
+        ] * ogParams.CUBE_DIM;  % grid positions
 
 coords = [coords ; flip(coords,1)];
 
@@ -60,7 +62,7 @@ end
 % Smooth out motion of angle theta5
 k = 11;
 movingAvgFilter = ones(1,k)/k;
-offset = 1;                % lookahead
+offset = 3;                % lookahead
 pad = floor(k/2);
 buzzAngle = conv(buzzAngle(:), movingAvgFilter);
 % figure
