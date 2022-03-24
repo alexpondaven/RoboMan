@@ -115,9 +115,9 @@ if initDynamixels(port_num, 'vel') == 0
 
     % DEMO DAY {[1,1,"in"],[2,1,"down"],[3,1,"out"]}
     % Task 2a Translation - from start to arbitrary finish location
-    cubeMoves = [[1,5,1]
-                 [2,6,0]
-                 [3,2,0]];
+    cubeMoves = [[1,4,0]
+                 [2,5,0]
+                 [3,6,0]];
     cubeStacks = [1,1,1,0,0,0];
 
 
@@ -128,15 +128,29 @@ if initDynamixels(port_num, 'vel') == 0
                  [3,3,-1]];
     cubeStacks = [1,1,1,0,0,0];
 
+    % backup if can't rotate on 1
+%     [[1,5,0]
+%      [5,5,1]
+%      [5,1,0]]
+
     % Task 3b Stacking - stack in any finishing location, with all red
     % faces facing away
     % Stacking on 2
-    cubeMoves = [[2,2,-1]
-                 [3,2,0]
-                 [1,1,1] % Rotate 1 away first
-                 [1,2,1]];
-    cubeStacks = [1,1,1,0,0,0];
+%     cubeMoves = [[2,2,-1]
+%                  [3,2,0]
+%                  [1,1,1] % Rotate 1 away first
+%                  [1,2,1]];
+%     cubeStacks = [1,1,1,0,0,0];
 
+    % Stacking on 3
+    cubeMoves = [[2,3,-1]
+                 [1,1,1] % Rotate 1 away first
+                 [1,3,1]];
+    cubeStacks = [1,1,1,0,0,0];
+    
+    % If cannot rotate 1
+%     [[1,2,1]
+%      [2,3,1]]
     
     % Test movements
     % cubeMoves = [2,2,1];
